@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 const FIRST_GAME_SLUG = "fortnite";
 
@@ -13,7 +15,42 @@ const navLinks = [
 ];
 
 export function SiteHeader() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [pseudo, setPseudo] = useState<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    async function loadProfile(userId: string | undefined) {
+      if (!userId) {
+        setPseudo(null);
+        return;
+      }
+      const { data } = await supabase
+        .from("profiles")
+        .select("pseudo")
+        .eq("id", userId)
+        .maybeSingle();
+      setPseudo(data?.pseudo ?? null);
+    }
+
+    supabase.auth.getUser().then(({ data }) => loadProfile(data.user?.id));
+
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      loadProfile(session?.user?.id);
+    });
+
+    return () => subscription.subscription.unsubscribe();
+  }, []);
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setOpen(false);
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-bg/82 backdrop-blur-[14px]">
@@ -40,12 +77,25 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden shrink-0 items-center gap-3 whitespace-nowrap md:flex">
-          <button
-            type="button"
-            className="rounded-[9px] border border-border-strong px-[18px] py-[9px] text-[13.5px] hover:border-border-hover"
-          >
-            Se connecter
-          </button>
+          {pseudo ? (
+            <>
+              <span className="text-[13.5px] text-text-secondary">{pseudo}</span>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="rounded-[9px] border border-border-strong px-[18px] py-[9px] text-[13.5px] hover:border-border-hover"
+              >
+                Déconnexion
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/connexion"
+              className="rounded-[9px] border border-border-strong px-[18px] py-[9px] text-[13.5px] hover:border-border-hover"
+            >
+              Se connecter
+            </Link>
+          )}
           <Link
             href="/#vendre"
             className="rounded-[9px] bg-accent px-[18px] py-2.5 text-[13.5px] font-semibold text-bg hover:bg-accent-hover"
@@ -85,12 +135,28 @@ export function SiteHeader() {
             </Link>
           ))}
           <div className="mt-2 flex flex-col gap-2.5">
-            <button
-              type="button"
-              className="min-h-11 rounded-[9px] border border-border-strong px-[18px] text-[13.5px]"
-            >
-              Se connecter
-            </button>
+            {pseudo ? (
+              <>
+                <span className="text-[13.5px] text-text-secondary">
+                  Connecté en tant que {pseudo}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="min-h-11 rounded-[9px] border border-border-strong px-[18px] text-[13.5px]"
+                >
+                  Déconnexion
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/connexion"
+                onClick={() => setOpen(false)}
+                className="flex min-h-11 items-center justify-center rounded-[9px] border border-border-strong px-[18px] text-[13.5px]"
+              >
+                Se connecter
+              </Link>
+            )}
             <Link
               href="/#vendre"
               onClick={() => setOpen(false)}

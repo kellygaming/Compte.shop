@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 export function BuyButton({
@@ -14,9 +15,12 @@ export function BuyButton({
 
   if (!isAuthenticated) {
     return (
-      <div className="rounded-lg border border-border-soft px-4 py-3 text-sm text-text-secondary">
-        Connectez-vous pour acheter cette annonce.
-      </div>
+      <Link
+        href={`/connexion?next=/annonces/${listingId}`}
+        className="flex w-full items-center justify-center rounded-[10px] bg-accent px-6 py-3.5 text-sm font-semibold text-bg hover:bg-accent-hover"
+      >
+        Se connecter pour acheter
+      </Link>
     );
   }
 
