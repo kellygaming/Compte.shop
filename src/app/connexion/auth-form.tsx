@@ -31,7 +31,10 @@ export function AuthForm({ next }: { next: string }) {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { pseudo } },
+        options: {
+          data: { pseudo },
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        },
       });
 
       if (signUpError) {
