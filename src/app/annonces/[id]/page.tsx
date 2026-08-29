@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { createClient } from "@/lib/supabase/server";
 import { formatAmount, formatRating } from "@/lib/format";
 import { BuyButton } from "./buy-button";
+import { ImageGallery } from "./image-gallery";
 
 /**
  * Extension non validée par le client : la fiche d'annonce n'a pas été
@@ -54,7 +55,7 @@ export default async function ListingDetailPage({
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <div className="mb-6 h-[320px] rounded-2xl border border-border-soft bg-media-empty" />
+            <ImageGallery images={listing.images} alt={listing.title} />
             <h1 className="mb-3 font-display text-[28px] font-semibold tracking-[-0.02em]">
               {listing.title}
             </h1>
