@@ -40,12 +40,20 @@ export function CategoryGrid({ games }: { games: Game[] }) {
                 {game.name}
               </div>
               <div className="flex flex-wrap gap-x-2.5 gap-y-1 text-[13px] text-text-secondary">
-                <span className="whitespace-nowrap">
-                  À partir de {formatAmount(game.minPriceXOF)} F CFA
-                </span>
-                <span className="whitespace-nowrap text-text-tertiary">
-                  · {game.listingCount} annonces
-                </span>
+                {game.minPriceXOF !== null ? (
+                  <>
+                    <span className="whitespace-nowrap">
+                      À partir de {formatAmount(game.minPriceXOF)} F CFA
+                    </span>
+                    <span className="whitespace-nowrap text-text-tertiary">
+                      · {game.listingCount} annonces
+                    </span>
+                  </>
+                ) : (
+                  <span className="whitespace-nowrap text-text-tertiary">
+                    Aucune annonce pour le moment
+                  </span>
+                )}
               </div>
             </div>
           </Link>

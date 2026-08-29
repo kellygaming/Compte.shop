@@ -59,7 +59,13 @@ export default async function HomePage() {
               <span>Support 24 h / 24</span>
             </div>
           </div>
-          <HeroCarousel items={heroItems} />
+          {heroItems.length > 0 ? (
+            <HeroCarousel items={heroItems} />
+          ) : (
+            <div className="flex h-[340px] items-center justify-center rounded-[18px] border border-border-soft bg-surface p-8 text-center text-sm text-text-tertiary">
+              Aucune annonce vérifiée pour le moment.
+            </div>
+          )}
         </section>
 
         <TrustStrip />

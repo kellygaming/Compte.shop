@@ -1,10 +1,14 @@
 import Image from "next/image";
+import Link from "next/link";
 import { formatAmount, formatRating } from "@/lib/format";
 import type { Listing } from "@/lib/types";
 
 export function ListingCard({ listing }: { listing: Listing }) {
   return (
-    <div className="cursor-pointer overflow-hidden rounded-[14px] border border-border-soft bg-surface hover:border-border-hover">
+    <Link
+      href={`/annonces/${listing.id}`}
+      className="block overflow-hidden rounded-[14px] border border-border-soft bg-surface hover:border-border-hover"
+    >
       <div className="relative h-[150px] bg-media-empty">
         <Image
           src={listing.images[0]}
@@ -24,8 +28,10 @@ export function ListingCard({ listing }: { listing: Listing }) {
           {listing.title}
         </div>
         <div className="mb-3.5 truncate text-xs text-text-tertiary">
-          {listing.sellerPseudo} · {listing.sellerSalesCount} ventes ·{" "}
-          {formatRating(listing.sellerRating)} ★
+          {listing.sellerPseudo} · {listing.sellerSalesCount} ventes
+          {listing.sellerRating !== null
+            ? ` · ${formatRating(listing.sellerRating)} ★`
+            : null}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="whitespace-nowrap font-display text-lg font-semibold">
@@ -39,7 +45,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

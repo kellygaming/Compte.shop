@@ -139,8 +139,10 @@ export function HeroCarousel({ items }: { items: HeroItem[] }) {
             {current.listing.title}
           </div>
           <div className="text-[13px] text-text-tertiary">
-            Vendeur ID vérifié · {current.listing.sellerSalesCount} ventes ·{" "}
-            {formatRating(current.listing.sellerRating)} ★
+            Vendeur ID vérifié · {current.listing.sellerSalesCount} ventes
+            {current.listing.sellerRating !== null
+              ? ` · ${formatRating(current.listing.sellerRating)} ★`
+              : null}
           </div>
         </div>
         <div className="whitespace-nowrap font-display text-[22px] font-semibold">

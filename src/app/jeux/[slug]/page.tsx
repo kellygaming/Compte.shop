@@ -12,11 +12,6 @@ import {
   getListingsByGame,
 } from "@/lib/data";
 
-export async function generateStaticParams() {
-  const games = await getGames();
-  return games.map((game) => ({ slug: game.slug }));
-}
-
 export default async function ListingPage({
   params,
 }: {

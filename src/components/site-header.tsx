@@ -97,7 +97,7 @@ export function SiteHeader() {
             </Link>
           )}
           <Link
-            href="/#vendre"
+            href="/vendre"
             className="rounded-[9px] bg-accent px-[18px] py-2.5 text-[13.5px] font-semibold text-bg hover:bg-accent-hover"
           >
             Devenir vendeur
@@ -158,7 +158,7 @@ export function SiteHeader() {
               </Link>
             )}
             <Link
-              href="/#vendre"
+              href="/vendre"
               onClick={() => setOpen(false)}
               className="flex min-h-11 items-center justify-center rounded-[9px] bg-accent px-[18px] text-[13.5px] font-semibold text-bg"
             >

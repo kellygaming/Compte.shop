@@ -13,8 +13,8 @@ const linkColumns = [
   {
     label: "Vendre",
     links: [
-      { label: "Devenir vendeur", href: "/#vendre" },
-      { label: "Vérification d'identité", href: "/#vendre" },
+      { label: "Devenir vendeur", href: "/vendre" },
+      { label: "Vérification d'identité", href: "/vendre" },
     ],
   },
   {

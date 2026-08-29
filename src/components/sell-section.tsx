@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { sellerSteps } from "@/lib/content";
 
 export function SellSection() {
@@ -18,12 +19,12 @@ export function SellSection() {
             tableau de bord s&apos;ouvre et vous publiez vos comptes en
             quelques minutes.
           </p>
-          <button
-            type="button"
-            className="rounded-[10px] bg-accent px-6 py-[13px] text-sm font-semibold text-bg hover:bg-accent-hover"
+          <Link
+            href="/vendre"
+            className="inline-block rounded-[10px] bg-accent px-6 py-[13px] text-sm font-semibold text-bg hover:bg-accent-hover"
           >
             Créer mon compte vendeur
-          </button>
+          </Link>
         </div>
         <div className="flex flex-col gap-3.5">
           {sellerSteps.map((step) => (

@@ -3,7 +3,7 @@ export type Game = {
   name: string;
   image: string;
   listingCount: number;
-  minPriceXOF: number;
+  minPriceXOF: number | null;
 };
 
 export type ListingStatus = "draft" | "pending" | "live" | "sold";
@@ -19,7 +19,7 @@ export type Listing = {
   sellerId: string;
   sellerPseudo: string;
   sellerSalesCount: number;
-  sellerRating: number;
+  sellerRating: number | null;
   verified: boolean;
   createdAt: string;
 };
