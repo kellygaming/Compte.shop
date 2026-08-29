@@ -157,6 +157,7 @@ export type Database = {
           confirm_deadline: string | null;
           created_at: string;
           delivered_at: string | null;
+          delivery_note: string | null;
           id: string;
           listing_id: string;
           seller_id: string;
@@ -169,6 +170,7 @@ export type Database = {
           confirm_deadline?: string | null;
           created_at?: string;
           delivered_at?: string | null;
+          delivery_note?: string | null;
           id?: string;
           listing_id: string;
           seller_id: string;
@@ -181,6 +183,7 @@ export type Database = {
           confirm_deadline?: string | null;
           created_at?: string;
           delivered_at?: string | null;
+          delivery_note?: string | null;
           id?: string;
           listing_id?: string;
           seller_id?: string;

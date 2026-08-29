@@ -1,9 +1,10 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { createClient } from "@/lib/supabase/server";
+import { releaseExpiredOrders } from "@/lib/orders";
 import { formatAmount } from "@/lib/format";
-import { OrderStatus } from "./order-status";
+import { OrderPanel } from "./order-panel";
 
 export default async function OrderPage({
   params,
@@ -13,15 +14,29 @@ export default async function OrderPage({
   const { id } = await params;
   const supabase = await createClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    redirect(`/connexion?next=/commandes/${id}`);
+  }
+
+  await releaseExpiredOrders();
+
   const { data: order } = await supabase
     .from("orders")
-    .select("id, status, amount_xof, created_at")
+    .select(
+      "id, status, amount_xof, created_at, buyer_id, seller_id, delivered_at, confirm_deadline, delivery_note",
+    )
     .eq("id", id)
     .maybeSingle();
 
   if (!order) {
     notFound();
   }
+
+  const role: "buyer" | "seller" =
+    order.seller_id === user.id ? "seller" : "buyer";
 
   return (
     <>
@@ -33,7 +48,7 @@ export default async function OrderPage({
         <p className="mb-8 text-sm text-text-tertiary">
           {formatAmount(order.amount_xof)} F CFA
         </p>
-        <OrderStatus orderId={order.id} initialStatus={order.status} />
+        <OrderPanel order={order} role={role} />
       </main>
       <SiteFooter />
     </>
