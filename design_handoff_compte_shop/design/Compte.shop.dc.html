@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #0E1013; }
+  * { box-sizing: border-box; }
+  a { color: oklch(0.82 0.11 158); text-decoration: none; }
+  a:hover { color: oklch(0.9 0.09 158); }
+  ::selection { background: oklch(0.82 0.11 158); color: #0E1013; }
+</style>
+</helmet>
+
+<div style="background:#0E1013;color:#EDEAE4;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased">
+
+  <header style="position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:clamp(14px,2.4vw,32px);padding:18px clamp(16px,4vw,48px);background:rgba(14,16,19,0.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,0.07)">
+    <div onClick="{{ goHome }}" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+      <div style="width:26px;height:26px;border-radius:7px;background:oklch(0.82 0.11 158);display:flex;align-items:center;justify-content:center;color:#0E1013;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px">C</div>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;letter-spacing:-0.01em">Compte.shop</span>
+    </div>
+    <nav style="display:flex;align-items:center;gap:clamp(14px,2.2vw,30px);font-size:14px;color:#9AA0A6;white-space:nowrap;min-width:0;flex:0 1 auto;overflow:hidden">
+      <span onClick="{{ goListing }}" style="cursor:pointer" style-hover="color:#EDEAE4">Catégories</span>
+      <span onClick="{{ goSell }}" style="cursor:pointer" style-hover="color:#EDEAE4">Vendre un compte</span>
+      <span onClick="{{ goProtect }}" style="cursor:pointer" style-hover="color:#EDEAE4">Protection</span>
+      <span onClick="{{ goSupport }}" style="cursor:pointer" style-hover="color:#EDEAE4">Support</span>
+    </nav>
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;white-space:nowrap">
+      <button style="background:none;border:1px solid rgba(255,255,255,0.14);color:#EDEAE4;padding:9px 18px;border-radius:9px;font-size:13.5px;font-family:inherit;cursor:pointer" style-hover="border-color:rgba(255,255,255,0.32)">Se connecter</button>
+      <button onClick="{{ goSell }}" style="background:oklch(0.82 0.11 158);border:none;color:#0E1013;padding:10px 18px;border-radius:9px;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer" style-hover="background:oklch(0.88 0.1 158)">Devenir vendeur</button>
+    </div>
+  </header>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <main>
+
+    <section style="padding:110px 48px 84px;max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1.05fr 0.95fr;gap:72px;align-items:center">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:9px;padding:6px 13px;border:1px solid rgba(255,255,255,0.12);border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:#9AA0A6;margin-bottom:28px">
+          <span style="width:6px;height:6px;border-radius:50%;background:oklch(0.82 0.11 158)"></span>
+          Marché ouvert &amp; vérifié
+        </div>
+        <h1 style="font-family:'Space Grotesk',sans-serif;font-size:60px;line-height:1.04;font-weight:600;letter-spacing:-0.03em;margin:0 0 22px;text-wrap:pretty">Reprenez votre compte là où vous l'avez laissé.</h1>
+        <p style="font-size:17.5px;line-height:1.6;color:#9AA0A6;margin:0 0 36px;max-width:520px;text-wrap:pretty">Achetez et vendez des comptes de jeu entre joueurs. Chaque vendeur est vérifié par pièce d'identité, et votre paiement reste bloqué jusqu'à ce que le compte soit bien entre vos mains.</p>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid rgba(255,255,255,0.12);border-radius:13px;background:#15181C;max-width:520px;margin-bottom:22px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6E747A;padding-left:12px">↳</span>
+          <input placeholder="Fortnite, Free Fire, Brawl Stars, Roblox…" style="flex:1;background:none;border:none;outline:none;color:#EDEAE4;font-size:15px;font-family:inherit;padding:8px 0" />
+          <button onClick="{{ goListing }}" style="background:oklch(0.82 0.11 158);border:none;color:#0E1013;padding:12px 22px;border-radius:9px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer" style-hover="background:oklch(0.88 0.1 158)">Explorer</button>
+        </div>
+        <div style="display:flex;gap:28px;font-size:13.5px;color:#6E747A">
+          <span>1 480 comptes vendus</span>
+          <span>Note moyenne 4,8 / 5</span>
+          <span>Support 24 h / 24</span>
+        </div>
+      </div>
+      <div style="position:relative">
+        <div style="border:1px solid rgba(255,255,255,0.1);border-radius:18px;background:#15181C;padding:22px;box-shadow:0 30px 80px -40px rgba(0,0,0,0.9)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#6E747A">Annonce vérifiée</span>
+            <span style="font-size:11.5px;color:oklch(0.82 0.11 158);border:1px solid oklch(0.82 0.11 158 / 0.35);padding:3px 9px;border-radius:100px;white-space:nowrap">Séquestre actif</span>
+          </div>
+          <div style="position:relative;height:230px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);background:#101317">
+            <div role="img" aria-label="{{ hero.game }}" style="position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 380ms ease;opacity:{{ hero.opacity }};background-image:{{ hero.imgUrl }}"></div>
+            <div style="position:absolute;inset:auto 0 0 0;height:88px;background:linear-gradient(to top,rgba(14,16,19,0.92),transparent)"></div>
+            <div style="position:absolute;left:14px;bottom:14px;display:flex;gap:7px">
+              <sc-for list="{{ heroDots }}" as="dot" hint-placeholder-count="4">
+                <span onClick="{{ dot.open }}" title="{{ dot.name }}" style="width:22px;height:4px;border-radius:100px;cursor:pointer;background:{{ dot.bg }}"></span>
+              </sc-for>
+            </div>
+            <div style="position:absolute;right:12px;top:12px;display:flex;gap:6px">
+              <span onClick="{{ heroPrev }}" style="width:28px;height:28px;border-radius:8px;background:rgba(14,16,19,0.72);border:1px solid rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;font-size:13px;color:#EDEAE4;cursor:pointer" style-hover="border-color:rgba(255,255,255,0.4)">‹</span>
+              <span onClick="{{ heroNext }}" style="width:28px;height:28px;border-radius:8px;background:rgba(14,16,19,0.72);border:1px solid rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;font-size:13px;color:#EDEAE4;cursor:pointer" style-hover="border-color:rgba(255,255,255,0.4)">›</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:18px">
+            <div style="min-width:0">
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;margin-bottom:5px;transition:opacity 380ms ease;opacity:{{ hero.opacity }}">{{ hero.title }}</div>
+              <div style="font-size:13px;color:#6E747A">Vendeur ID vérifié · {{ hero.sales }} ventes · {{ hero.rating }} ★</div>
+            </div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;white-space:nowrap">{{ hero.price }} <span style="font-size:13px;color:#9AA0A6">F CFA</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <sc-if value="{{ showTrustStrip }}" hint-placeholder-val="{{ true }}">
+    <section style="border-top:1px solid rgba(255,255,255,0.07);border-bottom:1px solid rgba(255,255,255,0.07);background:#111418">
+      <div style="max-width:1240px;margin:0 auto;padding:26px 48px;display:grid;grid-template-columns:repeat(4,1fr);gap:36px;font-size:13.5px;color:#9AA0A6">
+        <div>Paiement bloqué en séquestre</div>
+        <div>Vendeurs vérifiés par pièce d'identité</div>
+        <div>Garantie de remboursement 48 h</div>
+        <div>Historique et notes publiques</div>
+      </div>
+    </section>
+    </sc-if>
+
+    <section style="max-width:1240px;margin:0 auto;padding:96px 48px 20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:36px">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.08em;text-transform:uppercase;color:#6E747A;margin-bottom:12px">01 — Catégories</div>
+          <h2 style="font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:600;letter-spacing:-0.02em;margin:0">Choisissez votre jeu</h2>
+        </div>
+        <span onClick="{{ goListing }}" style="font-size:14px;color:oklch(0.82 0.11 158);cursor:pointer">Tout voir →</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
+        <sc-for list="{{ games }}" as="game" hint-placeholder-count="4">
+          <div onClick="{{ game.open }}" style="border:1px solid rgba(255,255,255,0.1);border-radius:16px;background:#15181C;overflow:hidden;cursor:pointer" style-hover="border-color:rgba(255,255,255,0.26)">
+            <div role="img" aria-label="{{ game.name }}" style="height:170px;background-color:#101317;background-size:cover;background-position:center;background-image:{{ game.imgUrl }}"></div>
+            <div style="padding:18px 20px 20px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:18.5px;font-weight:600;white-space:nowrap">{{ game.name }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:#9AA0A6">
+                <span style="white-space:nowrap">À partir de {{ game.from }} F CFA</span>
+                <span style="white-space:nowrap;color:#6E747A">· {{ game.count }} annonces</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="protection" style="max-width:1240px;margin:0 auto;padding:96px 48px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.08em;text-transform:uppercase;color:#6E747A;margin-bottom:12px">02 — Sécurité</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:600;letter-spacing:-0.02em;margin:0 0 14px">Voici comment nous vous protégeons des arnaques</h2>
+      <p style="font-size:16.5px;line-height:1.6;color:#9AA0A6;margin:0 0 44px;max-width:640px;text-wrap:pretty">Aucun échange en direct, aucun paiement à l'aveugle. Nous restons entre l'acheteur et le vendeur du premier message jusqu'à la remise du compte.</p>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px">
+        <sc-for list="{{ protections }}" as="item" hint-placeholder-count="6">
+          <div style="border:1px solid rgba(255,255,255,0.1);border-radius:14px;background:#15181C;padding:26px 26px 28px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:oklch(0.82 0.11 158);margin-bottom:14px">{{ item.num }}</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;margin-bottom:9px">{{ item.title }}</div>
+            <div style="font-size:14.5px;line-height:1.6;color:#9AA0A6;text-wrap:pretty">{{ item.body }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ showEscrowTimeline }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:18px;border:1px solid rgba(255,255,255,0.1);border-radius:14px;background:#111418;padding:30px 26px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.08em;text-transform:uppercase;color:#6E747A;margin-bottom:24px">Le déroulé d'un achat</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:26px">
+          <sc-for list="{{ steps }}" as="step" hint-placeholder-count="4">
+            <div style="border-top:1px solid rgba(255,255,255,0.14);padding-top:16px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:oklch(0.82 0.11 158);margin-bottom:10px">{{ step.num }}</div>
+              <div style="font-size:15px;font-weight:600;margin-bottom:7px;font-family:'Space Grotesk',sans-serif">{{ step.title }}</div>
+              <div style="font-size:13.5px;line-height:1.55;color:#9AA0A6">{{ step.body }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+    </section>
+
+    <section id="support" style="border-top:1px solid rgba(255,255,255,0.07);background:#111418">
+      <div style="max-width:1240px;margin:0 auto;padding:80px 48px;display:grid;grid-template-columns:1fr 0.9fr;gap:72px;align-items:center">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.08em;text-transform:uppercase;color:#6E747A;margin-bottom:12px">03 — Support</div>
+          <h2 style="font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:600;letter-spacing:-0.02em;margin:0 0 14px">Un humain au bout du fil, 24 h / 24</h2>
+          <p style="font-size:16.5px;line-height:1.6;color:#9AA0A6;margin:0 0 28px;max-width:520px;text-wrap:pretty">Un doute sur une annonce, un transfert qui traîne, un remboursement à lancer : notre équipe répond en moins de 10 minutes, tous les jours de l'année.</p>
+          <div style="display:flex;gap:12px">
+            <button style="background:oklch(0.82 0.11 158);border:none;color:#0E1013;padding:13px 22px;border-radius:10px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer" style-hover="background:oklch(0.88 0.1 158)">Ouvrir le chat</button>
+            <button style="background:none;border:1px solid rgba(255,255,255,0.16);color:#EDEAE4;padding:13px 22px;border-radius:10px;font-size:14px;font-family:inherit;cursor:pointer" style-hover="border-color:rgba(255,255,255,0.34)">{{ supportContact }}</button>
+          </div>
+        </div>
+        <div style="border:1px solid rgba(255,255,255,0.1);border-radius:16px;background:#15181C;padding:24px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+            <span style="width:7px;height:7px;border-radius:50%;background:oklch(0.82 0.11 158)"></span>
+            <span style="font-size:13px;color:#9AA0A6">Équipe en ligne — 3 conseillers disponibles</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="align-self:flex-start;max-width:80%;background:#1C2026;border-radius:12px 12px 12px 4px;padding:12px 15px;font-size:14px;line-height:1.5">Le vendeur ne répond plus depuis 2 h, je fais quoi ?</div>
+            <div style="align-self:flex-end;max-width:80%;background:oklch(0.82 0.11 158);color:#0E1013;border-radius:12px 12px 4px 12px;padding:12px 15px;font-size:14px;line-height:1.5">Votre paiement est toujours en séquestre. Je relance le vendeur maintenant, et sans réponse d'ici 24 h vous êtes remboursé automatiquement.</div>
+          </div>
+          <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);font-family:'JetBrains Mono',monospace;font-size:11px;color:#6E747A">Temps de réponse moyen · 6 min</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="vendre" style="max-width:1240px;margin:0 auto;padding:96px 48px">
+      <div style="display:grid;grid-template-columns:0.95fr 1.05fr;gap:72px;align-items:start">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.08em;text-transform:uppercase;color:#6E747A;margin-bottom:12px">04 — Vendre</div>
+          <h2 style="font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:600;letter-spacing:-0.02em;margin:0 0 14px">Un marché ouvert, mais pas anonyme</h2>
+          <p style="font-size:16.5px;line-height:1.6;color:#9AA0A6;margin:0 0 26px;text-wrap:pretty">N'importe quel joueur peut vendre sur Compte.shop. La seule condition : nous dire qui vous êtes. Pièce d'identité ou extrait de naissance, plus une photo. Après vérification, votre tableau de bord s'ouvre et vous publiez vos comptes en quelques minutes.</p>
+          <button onClick="{{ goSell }}" style="background:oklch(0.82 0.11 158);border:none;color:#0E1013;padding:13px 24px;border-radius:10px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer" style-hover="background:oklch(0.88 0.1 158)">Créer mon compte vendeur</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ sellerSteps }}" as="step" hint-placeholder-count="4">
+            <div style="display:flex;gap:20px;align-items:flex-start;border:1px solid rgba(255,255,255,0.1);border-radius:14px;background:#15181C;padding:22px 24px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:oklch(0.82 0.11 158);padding-top:3px">{{ step.num }}</div>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-size:17.5px;font-weight:600;margin-bottom:7px">{{ step.title }}</div>
+                <div style="font-size:14px;line-height:1.6;color:#9AA0A6;text-wrap:pretty">{{ step.body }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isListing }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1240px;margin:0 auto;padding:48px 48px 96px">
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6E747A;margin-bottom:26px">
+      <span onClick="{{ goHome }}" style="cursor:pointer">Accueil</span>
+      <span>/</span>
+      <span style="color:#EDEAE4">{{ activeGame }}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px">
+      <div>
+        <h1 style="font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:600;letter-spacing:-0.02em;margin:0 0 10px">Comptes {{ activeGame }}</h1>
+        <div style="font-size:14.5px;color:#9AA0A6">{{ listingCount }} annonces vérifiées · paiement en séquestre sur chaque achat</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="4">
+          <span onClick="{{ tab.open }}" style="cursor:pointer;padding:9px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.14);font-size:13.5px;color:#9AA0A6" style-hover="border-color:rgba(255,255,255,0.34);color:#EDEAE4">{{ tab.name }}</span>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:32px;align-items:start">
+      <aside style="border:1px solid rgba(255,255,255,0.1);border-radius:14px;background:#15181C;padding:22px;position:sticky;top:110px">
+        <sc-for list="{{ filters }}" as="filter" hint-placeholder-count="3">
+          <div style="margin-bottom:24px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.07em;text-transform:uppercase;color:#6E747A;margin-bottom:12px">{{ filter.label }}</div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <sc-for list="{{ filter.options }}" as="opt" hint-placeholder-count="3">
+                <label style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:#C7C9CC;cursor:pointer">
+                  <span style="width:14px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,0.24)"></span>
+                  {{ opt }}
+                </label>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:18px;font-size:12.5px;line-height:1.6;color:#6E747A">Seuls les vendeurs dont l'identité est validée peuvent publier.</div>
+      </aside>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px">
+        <sc-for list="{{ listings }}" as="ad" hint-placeholder-count="9">
+          <div style="border:1px solid rgba(255,255,255,0.1);border-radius:14px;background:#15181C;overflow:hidden;cursor:pointer" style-hover="border-color:rgba(255,255,255,0.26)">
+            <div role="img" aria-label="{{ ad.title }}" style="height:150px;background-color:#101317;background-size:cover;background-position:center;position:relative;background-image:{{ ad.imgUrl }}">
+              <span style="position:absolute;top:10px;left:10px;font-size:10.5px;font-family:'JetBrains Mono',monospace;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.82 0.11 158);background:rgba(14,16,19,0.75);border:1px solid oklch(0.82 0.11 158 / 0.35);padding:4px 8px;border-radius:100px">Vérifié</span>
+            </div>
+            <div style="padding:16px 18px 18px">
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;margin-bottom:8px;line-height:1.3">{{ ad.title }}</div>
+              <div style="font-size:12.5px;color:#6E747A;margin-bottom:14px">{{ ad.seller }} · {{ ad.sales }} ventes · {{ ad.rating }} ★</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center">
+                <span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;white-space:nowrap">{{ ad.price }} <span style="font-size:12px;color:#9AA0A6">F CFA</span></span>
+                <span style="font-size:12.5px;color:oklch(0.82 0.11 158);white-space:nowrap">Voir →</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <footer style="border-top:1px solid rgba(255,255,255,0.07);background:#111418">
+    <div style="max-width:1240px;margin:0 auto;padding:64px 48px 40px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="width:24px;height:24px;border-radius:7px;background:oklch(0.82 0.11 158);display:flex;align-items:center;justify-content:center;color:#0E1013;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px">C</div>
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600">Compte.shop</span>
+        </div>
+        <p style="font-size:13.5px;line-height:1.65;color:#9AA0A6;margin:0;max-width:340px;text-wrap:pretty">Un marché ouvert pour les comptes de jeu. Tout le monde peut vendre, personne n'est anonyme : identité vérifiée, paiement en séquestre, litiges arbitrés par notre équipe.</p>
+      </div>
+      <sc-for list="{{ footerCols }}" as="col" hint-placeholder-count="3">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.07em;text-transform:uppercase;color:#6E747A;margin-bottom:14px">{{ col.label }}</div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;color:#C7C9CC">
+            <sc-for list="{{ col.links }}" as="link" hint-placeholder-count="4">
+              <span style="cursor:pointer" style-hover="color:#EDEAE4">{{ link }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="max-width:1240px;margin:0 auto;padding:22px 48px 40px;border-top:1px solid rgba(255,255,255,0.07);display:flex;justify-content:space-between;font-size:12.5px;color:#6E747A">
+      <span>© 2026 Compte.shop — tous droits réservés</span>
+      <span>Prix affichés en francs CFA (XOF)</span>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showTrustStrip&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Accueil&quot;},&quot;showEscrowTimeline&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Accueil&quot;},&quot;supportContact&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;WhatsApp +225 07 00 00 00&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Support&quot;}}">
+class Component extends DCLogic {
+  state = { view: 'home', game: 'Fortnite', hero: 0, heroFade: 1 };
+
+  componentDidMount() {
+    this.timer = setInterval(() => this.heroGo(this.state.hero + 1), 4200);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+    clearTimeout(this.fadeTimer);
+  }
+
+  heroGo = (i) => {
+    clearTimeout(this.fadeTimer);
+    this.setState({ heroFade: 0 });
+    this.fadeTimer = setTimeout(() => this.setState({ hero: (i + 4) % 4, heroFade: 1 }), 260);
+  };
+
+  heroStep = (d) => {
+    clearInterval(this.timer);
+    this.timer = setInterval(() => this.heroGo(this.state.hero + 1), 4200);
+    this.heroGo(this.state.hero + d);
+  };
+
+  go = (view, game) => {
+    this.setState(s => ({ view, game: game || s.game }));
+    if (typeof window !== 'undefined') window.scrollTo(0, 0);
+  };
+
+  scrollTo = (id) => {
+    this.setState({ view: 'home' });
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 80);
+    }, 60);
+  };
+
+  renderVals() {
+    const gameData = {
+      Fortnite: { count: 128, from: '12 000', img: 'uploads/fortinite.jpg' },
+      'Free Fire': { count: 102, from: '5 000', img: 'uploads/free%20fire.webp' },
+      'Brawl Stars': { count: 74, from: '6 500', img: 'uploads/brawl-stars-banner.webp' },
+      Roblox: { count: 91, from: '4 000', img: 'uploads/roblox.jpg' }
+    };
+    const names = Object.keys(gameData);
+
+    const titles = {
+      Fortnite: ['92 skins · Renegade Raider', 'Compte OG saison 2', '210 skins · pioches rares', 'Full accès e-mail changeable', '48 skins · V-Bucks inclus', 'Compte Chapitre 1 vérifié', '130 skins · manettes liées', 'Compte tournois vérifié', '75 skins · pass complets'],
+      'Free Fire': ['Compte Grandmaster · 40 personnages', 'Diamants + skins AK évolutifs', 'Compte niveau 70 · elite pass', 'Tous les personnages débloqués', 'Skins M1887 collector', 'Compte Heroic saison 30', 'Bundles rares 2021', 'Compte guilde légendaire', 'Arme évolutive MP40 max'],
+      'Brawl Stars': ['Tous les brawlers légendaires', '45 000 trophées', 'Compte max niveau 40', 'Brawlers hypercharge x12', '32 000 trophées · skins rares', 'Compte club président', 'Full skins saisonniers', '28 000 trophées', 'Compte starr road complet'],
+      Roblox: ['Inventaire limited 400 K', 'Compte 2016 · pseudo court', 'Robux + limiteds rares', 'Compte premium 12 mois', 'Inventaire 180 K Robux', 'Pseudo 4 lettres disponible', 'Compte builder club ancien', 'Limiteds collector', 'Compte 2018 vérifié']
+    };
+    const prices = ['45 000', '78 000', '120 000', '32 500', '18 000', '95 000', '54 000', '26 500', '68 000'];
+    const sellers = ['Kwabena_G', 'AtlasPlay', 'Nadia.K', 'ZoneGamer', 'M. Diallo', 'PixelTrade', 'Yao_224', 'SkinBank', 'Aminata.S'];
+
+    const g = this.state.game;
+    const listings = (titles[g] || titles.Fortnite).map((t, i) => ({
+      title: t,
+      imgUrl: 'url("' + (gameData[g] || gameData.Fortnite).img + '")',
+      price: prices[i % prices.length],
+      seller: sellers[i % sellers.length],
+      sales: 8 + i * 7,
+      rating: (4.5 + ((i * 3) % 5) / 10).toFixed(1).replace('.', ',')
+    }));
+
+    const heroAds = {
+      Fortnite: { title: 'Compte Fortnite — 92 skins', price: '45 000', sales: 34, rating: '4,9' },
+      'Free Fire': { title: 'Compte Free Fire — Grandmaster', price: '38 500', sales: 27, rating: '4,8' },
+      'Brawl Stars': { title: 'Compte Brawl Stars — 45 000 trophées', price: '52 000', sales: 41, rating: '4,9' },
+      Roblox: { title: 'Compte Roblox — limiteds 400 K', price: '120 000', sales: 19, rating: '5,0' }
+    };
+    const hi = this.state.hero % names.length;
+    const hName = names[hi];
+
+    return {
+      hero: Object.assign({ game: hName, imgUrl: 'url("' + gameData[hName].img + '")', opacity: this.state.heroFade }, heroAds[hName]),
+      heroDots: names.map((n, i) => ({ name: n, bg: i === hi ? 'oklch(0.82 0.11 158)' : 'rgba(255,255,255,0.28)', open: () => this.heroStep(i - hi) })),
+      heroPrev: () => this.heroStep(-1),
+      heroNext: () => this.heroStep(1),
+      isHome: this.state.view === 'home',
+      isListing: this.state.view === 'listing',
+      activeGame: g,
+      listingCount: (gameData[g] || {}).count,
+      showTrustStrip: this.props.showTrustStrip ?? true,
+      showEscrowTimeline: this.props.showEscrowTimeline ?? true,
+      supportContact: this.props.supportContact ?? 'WhatsApp +225 07 00 00 00',
+      goHome: () => this.go('home'),
+      goListing: () => this.go('listing'),
+      goSell: () => this.scrollTo('vendre'),
+      goProtect: () => this.scrollTo('protection'),
+      goSupport: () => this.scrollTo('support'),
+      games: names.map(n => ({ name: n, count: gameData[n].count, from: gameData[n].from, imgUrl: 'url("' + gameData[n].img + '")', open: () => this.go('listing', n) })),
+      tabs: names.map(n => ({ name: n, open: () => this.go('listing', n) })),
+      listings,
+      protections: [
+        { num: '01', title: 'Paiement bloqué en séquestre', body: "Votre argent est conservé par Compte.shop. Le vendeur n'est payé qu'une fois le compte reçu et testé par vous." },
+        { num: '02', title: 'Vendeurs vérifiés par pièce d\u2019identité', body: 'Carte d\u2019identité ou extrait de naissance, plus une photo. Aucune annonce ne part en ligne avant validation.' },
+        { num: '03', title: 'Remboursement garanti 48 h', body: "Compte inaccessible, description mensongère, reprise par l'ancien propriétaire : vous êtes remboursé intégralement." },
+        { num: '04', title: 'Historique et notes publiques', body: 'Chaque vendeur porte son bilan : nombre de ventes, note moyenne, litiges. Rien n\u2019est effaçable.' },
+        { num: '05', title: 'Support humain 24 h / 24', body: 'Un conseiller suit chaque transaction sensible et arbitre les litiges sous 24 heures.' },
+        { num: '06', title: 'Aucun échange hors plateforme', body: 'Toute tentative de vous faire payer en dehors du site entraîne le bannissement immédiat du vendeur.' }
+      ],
+      steps: [
+        { num: '01', title: 'Vous payez', body: 'Le montant part en séquestre, pas chez le vendeur.' },
+        { num: '02', title: 'Transfert', body: 'Le vendeur remet les accès dans la messagerie du site.' },
+        { num: '03', title: 'Vous testez', body: 'Vous avez 48 h pour vérifier le compte et changer les accès.' },
+        { num: '04', title: 'Vendeur payé', body: 'Vous confirmez, le vendeur reçoit son argent.' }
+      ],
+      sellerSteps: [
+        { num: '01', title: 'Vous envoyez vos pièces', body: 'Pièce d\u2019identité ou extrait de naissance + une photo de vous. Documents chiffrés, jamais publiés.' },
+        { num: '02', title: 'Nous vérifions', body: 'Contrôle manuel sous 24 h. Nous vous écrivons dès la validation.' },
+        { num: '03', title: 'Votre tableau de bord s\u2019ouvre', body: 'Publiez un compte : photos, prix en F CFA, description, jeu et détails du contenu.' },
+        { num: '04', title: 'Vous vendez et êtes payé', body: 'Suivi des vues, offres et ventes. Paiement libéré dès confirmation de l\u2019acheteur.' }
+      ],
+      filters: [
+        { label: 'Prix (F CFA)', options: ['Moins de 15 000', '15 000 – 50 000', '50 000 – 100 000', 'Plus de 100 000'] },
+        { label: 'Plateforme', options: ['PC', 'PlayStation', 'Xbox', 'Mobile', 'Nintendo Switch'] },
+        { label: 'Vendeur', options: ['Note 4,5 et plus', 'Plus de 20 ventes', 'Répond en moins d\u2019une heure'] }
+      ],
+      footerCols: [
+        { label: 'Marché', links: ['Fortnite', 'Free Fire', 'Brawl Stars', 'Roblox'] },
+        { label: 'Vendre', links: ['Devenir vendeur', 'Vérification d\u2019identité', 'Tableau de bord', 'Frais et paiements'] },
+        { label: 'Aide', links: ['Support 24 h / 24', 'Politique de remboursement', 'Signaler une annonce', 'Conditions d\u2019utilisation'] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
