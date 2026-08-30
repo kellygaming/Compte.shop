@@ -18,6 +18,7 @@ export function SiteHeader() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pseudo, setPseudo] = useState<string | null | undefined>(undefined);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -25,14 +26,16 @@ export function SiteHeader() {
     async function loadProfile(userId: string | undefined) {
       if (!userId) {
         setPseudo(null);
+        setIsAdmin(false);
         return;
       }
       const { data } = await supabase
         .from("profiles")
-        .select("pseudo")
+        .select("pseudo, role")
         .eq("id", userId)
         .maybeSingle();
       setPseudo(data?.pseudo ?? null);
+      setIsAdmin(data?.role === "admin");
     }
 
     supabase.auth.getUser().then(({ data }) => loadProfile(data.user?.id));
@@ -79,6 +82,11 @@ export function SiteHeader() {
         <div className="hidden shrink-0 items-center gap-3 whitespace-nowrap md:flex">
           {pseudo ? (
             <>
+              {isAdmin ? (
+                <Link href="/admin" className="text-[13.5px] text-text-secondary hover:text-text">
+                  Admin
+                </Link>
+              ) : null}
               <span className="text-[13.5px] text-text-secondary">{pseudo}</span>
               <button
                 type="button"
@@ -137,6 +145,15 @@ export function SiteHeader() {
           <div className="mt-2 flex flex-col gap-2.5">
             {pseudo ? (
               <>
+                {isAdmin ? (
+                  <Link
+                    href="/admin"
+                    onClick={() => setOpen(false)}
+                    className="flex min-h-11 items-center text-[15px] text-text-secondary hover:text-text"
+                  >
+                    Admin
+                  </Link>
+                ) : null}
                 <span className="text-[13.5px] text-text-secondary">
                   Connecté en tant que {pseudo}
                 </span>

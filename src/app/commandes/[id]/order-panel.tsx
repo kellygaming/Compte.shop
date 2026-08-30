@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DisputeThread } from "@/components/dispute-thread";
 
 type OrderStatus =
   | "pending_payment"
@@ -20,7 +21,12 @@ type Order = {
   delivered_at: string | null;
   confirm_deadline: string | null;
   delivery_note: string | null;
+  seller_confirmed_at: string | null;
+  payout_requested_at: string | null;
+  paid_out_at: string | null;
 };
+
+type Dispute = { id: string; status: string; escalated_at: string | null } | null;
 
 const KNOWN_STATUSES: OrderStatus[] = [
   "pending_payment",
@@ -44,9 +50,13 @@ const MAX_POLLS = 40;
 export function OrderPanel({
   order: initialOrder,
   role,
+  userId,
+  dispute,
 }: {
   order: Order;
   role: "buyer" | "seller";
+  userId: string;
+  dispute: Dispute;
 }) {
   const [order, setOrder] = useState(initialOrder);
   const [loading, setLoading] = useState(false);
@@ -54,6 +64,7 @@ export function OrderPanel({
   const [note, setNote] = useState("");
   const [disputeOpen, setDisputeOpen] = useState(false);
   const [disputeReason, setDisputeReason] = useState("");
+  const [escalated, setEscalated] = useState(Boolean(dispute?.escalated_at));
 
   const status = isKnownStatus(order.status) ? order.status : "pending_payment";
 
@@ -103,6 +114,22 @@ export function OrderPanel({
       const refreshed = await fetch(`/api/orders/${order.id}`);
       const refreshedData = await refreshed.json();
       if (refreshedData.order) setOrder(refreshedData.order);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleEscalate() {
+    if (!dispute) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/disputes/${dispute.id}/escalate`, { method: "POST" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Une erreur est survenue.");
+      setEscalated(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
@@ -197,7 +224,7 @@ export function OrderPanel({
                   onClick={() => callAction("confirm")}
                   className="rounded-[10px] bg-accent px-5 py-2.5 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
                 >
-                  {loading ? "…" : "Confirmer la réception"}
+                  {loading ? "…" : "Reçu, tout est ok"}
                 </button>
                 <button
                   type="button"
@@ -217,6 +244,67 @@ export function OrderPanel({
         </div>
       ) : null}
 
+      {status === "released" && role === "seller" ? (
+        <div className="rounded-2xl border border-border-soft bg-surface p-6">
+          {!order.seller_confirmed_at ? (
+            <>
+              <p className="mb-3 text-[13.5px] text-text-secondary">
+                L&apos;acheteur a confirmé. Confirmez à votre tour que la vente
+                est actée pour demander le versement.
+              </p>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => callAction("seller-confirm")}
+                className="rounded-[10px] bg-accent px-5 py-2.5 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
+              >
+                {loading ? "…" : "Je confirme la vente"}
+              </button>
+            </>
+          ) : order.paid_out_at ? (
+            <p className="text-[13.5px] text-text-secondary">Versement effectué.</p>
+          ) : order.payout_requested_at ? (
+            <p className="text-[13.5px] text-text-secondary">
+              Versement demandé, en cours de traitement.
+            </p>
+          ) : (
+            <>
+              <p className="mb-3 text-[13.5px] text-text-secondary">
+                Vente confirmée. Demandez le versement quand vous êtes prêt.
+              </p>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => callAction("request-payout")}
+                className="rounded-[10px] bg-accent px-5 py-2.5 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
+              >
+                {loading ? "…" : "Demander le versement"}
+              </button>
+            </>
+          )}
+        </div>
+      ) : null}
+
+      {status === "disputed" && dispute ? (
+        <div className="flex flex-col gap-4">
+          <DisputeThread disputeId={dispute.id} currentUserId={userId} closed={false} />
+          {!escalated ? (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleEscalate}
+              className="self-start rounded-[10px] border border-border-strong px-5 py-2.5 text-sm hover:border-border-hover disabled:opacity-60"
+            >
+              Appeler un admin
+            </button>
+          ) : (
+            <p className="text-[13px] text-text-tertiary">
+              Un administrateur a été prévenu et va trancher.
+            </p>
+          )}
+        </div>
+      ) : null}
+
       {error ? <p className="text-[13px] text-text-secondary">{error}</p> : null}
     </div>
   );
@@ -225,9 +313,9 @@ export function OrderPanel({
 const LABELS: Record<OrderStatus, string> = {
   pending_payment: "En attente de confirmation du paiement…",
   held: "Paiement reçu — bloqué en séquestre.",
-  released: "Commande finalisée — versement dû au vendeur.",
+  released: "Vente confirmée par l'acheteur.",
   refunded: "Commande remboursée.",
-  disputed: "Litige en cours — notre équipe intervient sous 24 h.",
+  disputed: "Litige en cours.",
   cancelled: "Commande annulée.",
 };
 

@@ -26,7 +26,7 @@ export default async function OrderPage({
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, status, amount_xof, created_at, buyer_id, seller_id, delivered_at, confirm_deadline, delivery_note",
+      "id, status, amount_xof, created_at, buyer_id, seller_id, delivered_at, confirm_deadline, delivery_note, seller_confirmed_at, payout_requested_at, paid_out_at",
     )
     .eq("id", id)
     .maybeSingle();
@@ -38,6 +38,18 @@ export default async function OrderPage({
   const role: "buyer" | "seller" =
     order.seller_id === user.id ? "seller" : "buyer";
 
+  let dispute: { id: string; status: string; escalated_at: string | null } | null = null;
+  if (order.status === "disputed") {
+    const { data } = await supabase
+      .from("disputes")
+      .select("id, status, escalated_at")
+      .eq("order_id", order.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    dispute = data;
+  }
+
   return (
     <>
       <SiteHeader />
@@ -48,7 +60,7 @@ export default async function OrderPage({
         <p className="mb-8 text-sm text-text-tertiary">
           {formatAmount(order.amount_xof)} F CFA
         </p>
-        <OrderPanel order={order} role={role} />
+        <OrderPanel order={order} role={role} userId={user.id} dispute={dispute} />
       </main>
       <SiteFooter />
     </>

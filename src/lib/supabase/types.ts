@@ -17,9 +17,49 @@ export type Database = {
   };
   public: {
     Tables: {
+      dispute_messages: {
+        Row: {
+          body: string;
+          created_at: string;
+          dispute_id: string;
+          id: string;
+          sender_id: string;
+        };
+        Insert: {
+          body: string;
+          created_at?: string;
+          dispute_id: string;
+          id?: string;
+          sender_id: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          dispute_id?: string;
+          id?: string;
+          sender_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dispute_messages_dispute_id_fkey";
+            columns: ["dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "disputes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "dispute_messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       disputes: {
         Row: {
           created_at: string;
+          escalated_at: string | null;
           id: string;
           opened_by: string;
           order_id: string;
@@ -30,6 +70,7 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
+          escalated_at?: string | null;
           id?: string;
           opened_by: string;
           order_id: string;
@@ -40,6 +81,7 @@ export type Database = {
         };
         Update: {
           created_at?: string;
+          escalated_at?: string | null;
           id?: string;
           opened_by?: string;
           order_id?: string;
@@ -160,6 +202,9 @@ export type Database = {
           delivery_note: string | null;
           id: string;
           listing_id: string;
+          paid_out_at: string | null;
+          payout_requested_at: string | null;
+          seller_confirmed_at: string | null;
           seller_id: string;
           status: string;
           updated_at: string;
@@ -173,6 +218,9 @@ export type Database = {
           delivery_note?: string | null;
           id?: string;
           listing_id: string;
+          paid_out_at?: string | null;
+          payout_requested_at?: string | null;
+          seller_confirmed_at?: string | null;
           seller_id: string;
           status?: string;
           updated_at?: string;
@@ -186,6 +234,9 @@ export type Database = {
           delivery_note?: string | null;
           id?: string;
           listing_id?: string;
+          paid_out_at?: string | null;
+          payout_requested_at?: string | null;
+          seller_confirmed_at?: string | null;
           seller_id?: string;
           status?: string;
           updated_at?: string;
