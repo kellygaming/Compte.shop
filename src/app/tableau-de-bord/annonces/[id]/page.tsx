@@ -21,7 +21,7 @@ export default async function EditListingPage({
 
   const { data: listing } = await supabase
     .from("listings")
-    .select("id, title, description, price_xof, status, seller_id")
+    .select("id, title, description, price_xof, status, seller_id, delivery_type, delivery_instructions")
     .eq("id", id)
     .maybeSingle();
 
@@ -49,6 +49,8 @@ export default async function EditListingPage({
             listingId={listing.id}
             initialPriceXOF={listing.price_xof}
             initialDescription={listing.description ?? ""}
+            initialDeliveryType={listing.delivery_type}
+            initialDeliveryInstructions={listing.delivery_instructions ?? ""}
           />
         )}
       </main>

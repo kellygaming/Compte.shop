@@ -25,7 +25,7 @@ export default async function ListingDetailPage({
     supabase
       .from("listings")
       .select(
-        "id, title, description, price_xof, images, game_slug, status, seller_id, sellers(sales_count, rating, profiles(pseudo))",
+        "id, title, description, price_xof, images, game_slug, status, seller_id, delivery_type, delivery_instructions, sellers(sales_count, rating, profiles(pseudo))",
       )
       .eq("id", id)
       .eq("status", "live")
@@ -40,6 +40,7 @@ export default async function ListingDetailPage({
   const seller = listing.sellers;
   const sellerPseudo = seller?.profiles?.pseudo ?? "Vendeur vérifié";
   const isOwnListing = auth.user?.id === listing.seller_id;
+  const isInstantDelivery = listing.delivery_type !== "manual";
 
   let buyerPhone: string | null = null;
   if (auth.user) {
@@ -79,12 +80,47 @@ export default async function ListingDetailPage({
           </div>
 
           <aside className="h-fit rounded-2xl border border-border-soft bg-surface p-6">
+            <div className="mb-5 flex items-center gap-2 rounded-lg border border-border-soft bg-bg px-3.5 py-2.5 text-[13px] text-text-secondary">
+              {isInstantDelivery
+                ? "🔑 Identifiants transmis dès la confirmation du paiement"
+                : "🤝 Remise manuelle — le vendeur doit être disponible après l'achat"}
+            </div>
+
             <div className="mb-5 font-display text-[26px] font-semibold">
               {formatAmount(listing.price_xof)}{" "}
               <span className="text-sm font-normal text-text-secondary">
                 F CFA
               </span>
             </div>
+
+            <dl className="mb-5 divide-y divide-border-soft border-y border-border-soft text-[13.5px]">
+              <div className="flex items-center justify-between py-2.5">
+                <dt className="text-text-tertiary">Jeu</dt>
+                <dd className="text-text">{listing.game_slug}</dd>
+              </div>
+              <div className="flex items-center justify-between py-2.5">
+                <dt className="text-text-tertiary">Remise du compte</dt>
+                <dd className="text-text">
+                  {isInstantDelivery ? "Instantanée" : "Manuelle"}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between py-2.5">
+                <dt className="text-text-tertiary">Vérification acheteur</dt>
+                <dd className="text-text">48 h après réception</dd>
+              </div>
+            </dl>
+
+            {listing.delivery_instructions ? (
+              <div className="mb-5 rounded-lg bg-bg px-3.5 py-3">
+                <div className="mb-1 font-mono-ui text-[10.5px] uppercase tracking-[0.04em] text-text-tertiary">
+                  Ce que dit le vendeur sur la remise
+                </div>
+                <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-text-secondary">
+                  {listing.delivery_instructions}
+                </p>
+              </div>
+            ) : null}
+
             <p className="mb-5 text-[13px] leading-relaxed text-text-tertiary">
               Paiement bloqué en séquestre jusqu&apos;à confirmation. Vous
               disposez de 48 h après réception des accès pour vérifier le

@@ -23,14 +23,24 @@ export async function PATCH(
     return NextResponse.json({ error: "Connexion requise." }, { status: 401 });
   }
 
-  let payload: { price_xof?: number; description?: string };
+  let payload: {
+    price_xof?: number;
+    description?: string;
+    delivery_type?: string;
+    delivery_instructions?: string;
+  };
   try {
     payload = await request.json();
   } catch {
     return NextResponse.json({ error: "Corps JSON invalide." }, { status: 400 });
   }
 
-  const update: { price_xof?: number; description?: string } = {};
+  const update: {
+    price_xof?: number;
+    description?: string;
+    delivery_type?: string;
+    delivery_instructions?: string;
+  } = {};
   if (payload.price_xof !== undefined) {
     if (!Number.isFinite(payload.price_xof) || payload.price_xof <= 0) {
       return NextResponse.json({ error: "Prix invalide." }, { status: 400 });
@@ -39,6 +49,12 @@ export async function PATCH(
   }
   if (payload.description !== undefined) {
     update.description = payload.description;
+  }
+  if (payload.delivery_type !== undefined) {
+    update.delivery_type = payload.delivery_type === "manual" ? "manual" : "instant";
+  }
+  if (payload.delivery_instructions !== undefined) {
+    update.delivery_instructions = payload.delivery_instructions;
   }
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "Rien à modifier." }, { status: 400 });

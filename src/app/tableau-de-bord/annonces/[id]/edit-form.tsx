@@ -10,14 +10,22 @@ export function EditListingForm({
   listingId,
   initialPriceXOF,
   initialDescription,
+  initialDeliveryType,
+  initialDeliveryInstructions,
 }: {
   listingId: string;
   initialPriceXOF: number;
   initialDescription: string;
+  initialDeliveryType: string;
+  initialDeliveryInstructions: string;
 }) {
   const router = useRouter();
   const [priceXOF, setPriceXOF] = useState(String(initialPriceXOF));
   const [description, setDescription] = useState(initialDescription);
+  const [deliveryType, setDeliveryType] = useState<"instant" | "manual">(
+    initialDeliveryType === "manual" ? "manual" : "instant",
+  );
+  const [deliveryInstructions, setDeliveryInstructions] = useState(initialDeliveryInstructions);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +44,12 @@ export function EditListingForm({
       const response = await fetch(`/api/listings/${listingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ price_xof: price, description }),
+        body: JSON.stringify({
+          price_xof: price,
+          description,
+          delivery_type: deliveryType,
+          delivery_instructions: deliveryInstructions,
+        }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -69,6 +82,42 @@ export function EditListingForm({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={5}
+          className={inputClass}
+        />
+      </label>
+      <div className="flex flex-col gap-1.5 text-[13px] text-text-secondary">
+        Comment se passera la remise du compte ?
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setDeliveryType("instant")}
+            className={`flex-1 rounded-[10px] border px-3.5 py-2.5 text-left text-[13.5px] ${
+              deliveryType === "instant"
+                ? "border-accent text-text"
+                : "border-border-strong text-text-secondary"
+            }`}
+          >
+            <div className="font-semibold">Instantané</div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setDeliveryType("manual")}
+            className={`flex-1 rounded-[10px] border px-3.5 py-2.5 text-left text-[13.5px] ${
+              deliveryType === "manual"
+                ? "border-accent text-text"
+                : "border-border-strong text-text-secondary"
+            }`}
+          >
+            <div className="font-semibold">Manuel</div>
+          </button>
+        </div>
+      </div>
+      <label className="flex flex-col gap-1.5 text-[13px] text-text-secondary">
+        Précisions sur la remise (affiché avant l&apos;achat)
+        <textarea
+          value={deliveryInstructions}
+          onChange={(e) => setDeliveryInstructions(e.target.value)}
+          rows={3}
           className={inputClass}
         />
       </label>

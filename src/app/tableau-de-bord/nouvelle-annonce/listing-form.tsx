@@ -17,6 +17,8 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
   const [description, setDescription] = useState("");
   const [priceXOF, setPriceXOF] = useState("");
   const [images, setImages] = useState<FileList | null>(null);
+  const [deliveryType, setDeliveryType] = useState<"instant" | "manual">("instant");
+  const [deliveryInstructions, setDeliveryInstructions] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,6 +66,8 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
           description,
           price_xof: price,
           images: imageUrls,
+          delivery_type: deliveryType,
+          delivery_instructions: deliveryInstructions,
         }),
       });
       const data = await response.json();
@@ -129,6 +133,53 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
           multiple
           onChange={(e) => setImages(e.target.files)}
           className={fileClass}
+        />
+      </Field>
+      <Field label="Comment se passera la remise du compte ?">
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setDeliveryType("instant")}
+            className={`flex-1 rounded-[10px] border px-3.5 py-2.5 text-left text-[13.5px] ${
+              deliveryType === "instant"
+                ? "border-accent text-text"
+                : "border-border-strong text-text-secondary"
+            }`}
+          >
+            <div className="font-semibold">Instantané</div>
+            <div className="text-[12px] text-text-tertiary">
+              Vous transmettez identifiant + mot de passe dès l&apos;achat,
+              l&apos;acheteur se connecte seul.
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setDeliveryType("manual")}
+            className={`flex-1 rounded-[10px] border px-3.5 py-2.5 text-left text-[13.5px] ${
+              deliveryType === "manual"
+                ? "border-accent text-text"
+                : "border-border-strong text-text-secondary"
+            }`}
+          >
+            <div className="font-semibold">Manuel</div>
+            <div className="text-[12px] text-text-tertiary">
+              Votre présence est nécessaire pour finaliser le transfert
+              après l&apos;achat.
+            </div>
+          </button>
+        </div>
+      </Field>
+      <Field label="Précisions sur la remise (affiché avant l'achat)">
+        <textarea
+          value={deliveryInstructions}
+          onChange={(e) => setDeliveryInstructions(e.target.value)}
+          rows={3}
+          className={inputClass}
+          placeholder={
+            deliveryType === "instant"
+              ? "Ex. Email + mot de passe. Après ton achat tu reçois les identifiants, connecte-toi et profite."
+              : "Ex. Email + mot de passe. Après ton achat je dois être présent pour te donner accès complet — laisse un message, je serai disponible."
+          }
         />
       </Field>
 

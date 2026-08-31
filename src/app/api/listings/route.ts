@@ -23,6 +23,8 @@ export async function POST(request: Request) {
     description?: string;
     price_xof?: number;
     images?: string[];
+    delivery_type?: string;
+    delivery_instructions?: string;
   };
   try {
     payload = await request.json();
@@ -34,6 +36,7 @@ export async function POST(request: Request) {
   if (!game_slug || !title || !price_xof || price_xof <= 0) {
     return NextResponse.json({ error: "Champs manquants ou invalides." }, { status: 400 });
   }
+  const deliveryType = payload.delivery_type === "manual" ? "manual" : "instant";
 
   const { data: listing, error } = await supabase
     .from("listings")
@@ -45,6 +48,8 @@ export async function POST(request: Request) {
       price_xof,
       images: payload.images ?? [],
       status: "live",
+      delivery_type: deliveryType,
+      delivery_instructions: payload.delivery_instructions ?? "",
     })
     .select("id")
     .single();
