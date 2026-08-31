@@ -29,8 +29,28 @@ export function ReconcileButton({ orderId }: { orderId: string }) {
     }
   }
 
+  async function handleManualConfirm() {
+    if (!confirm("Confirmer que ce paiement a bien été reçu (vérifié sur le tableau de bord MoneyFusion) ?")) {
+      return;
+    }
+    setLoading(true);
+    setResult(null);
+    try {
+      const response = await fetch(`/api/admin/orders/${orderId}/mark-held`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      setResult(response.ok ? "Commande marquée payée." : (data.error ?? "Échec."));
+      router.refresh();
+    } catch {
+      setResult("Échec de la confirmation manuelle.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <button
         type="button"
         onClick={handleClick}
@@ -39,7 +59,15 @@ export function ReconcileButton({ orderId }: { orderId: string }) {
       >
         {loading ? "Vérification…" : "Revérifier auprès de MoneyFusion"}
       </button>
-      {result ? <p className="mt-2 text-[13px] text-text-tertiary">{result}</p> : null}
+      <button
+        type="button"
+        onClick={handleManualConfirm}
+        disabled={loading}
+        className="self-start text-[12.5px] text-text-tertiary underline hover:text-text-secondary disabled:opacity-60"
+      >
+        Commande sans token (créée avant le correctif) ? Confirmer manuellement après vérification sur MoneyFusion
+      </button>
+      {result ? <p className="text-[13px] text-text-tertiary">{result}</p> : null}
     </div>
   );
 }
