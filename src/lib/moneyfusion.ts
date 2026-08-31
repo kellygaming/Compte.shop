@@ -67,15 +67,29 @@ export async function initiateMoneyFusionPayment(
     body: JSON.stringify(body),
   });
 
+  const rawText = await response.text();
+
   if (!response.ok) {
+    console.error(
+      `MoneyFusion ${response.status} sur ${endpoint} — body envoyé: ${JSON.stringify(body)} — réponse: ${rawText}`,
+    );
     throw new Error(
       `MoneyFusion a répondu ${response.status} à l'initiation du paiement.`,
     );
   }
 
-  const data = (await response.json()) as MoneyFusionPayResponse;
+  let data: MoneyFusionPayResponse;
+  try {
+    data = JSON.parse(rawText) as MoneyFusionPayResponse;
+  } catch {
+    console.error(`MoneyFusion a renvoyé une réponse non-JSON: ${rawText}`);
+    throw new Error("MoneyFusion a renvoyé une réponse invalide.");
+  }
 
   if (!data.statut || !data.url) {
+    console.error(
+      `MoneyFusion statut=${data.statut} sans url — body envoyé: ${JSON.stringify(body)} — réponse: ${rawText}`,
+    );
     throw new Error(
       data.message ?? "MoneyFusion n'a pas renvoyé de lien de paiement.",
     );

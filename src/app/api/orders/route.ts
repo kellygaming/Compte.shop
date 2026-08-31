@@ -130,7 +130,12 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ orderId: order.id, paymentUrl });
-  } catch {
+  } catch (err) {
+    console.error(
+      "Échec initiation MoneyFusion pour la commande",
+      order.id,
+      err instanceof Error ? err.message : err,
+    );
     await db
       .from("payment_transactions")
       .update({ status: "failed" })
