@@ -141,6 +141,19 @@ export function EditListingForm({
       {deliveryType === "instant" ? (
         <label className="flex flex-col gap-1.5 text-[13px] text-text-secondary">
           Email + mot de passe à donner à l&apos;acheteur
+          <p className="text-[12.5px] leading-relaxed text-text-tertiary">
+            Ceci sera envoyé automatiquement à l&apos;acheteur dès qu&apos;il
+            paie — personne ne pourra te contacter pour le débloquer.
+            Vérifie que le compte peut se connecter seul, sans toi :
+          </p>
+          <ul className="list-disc pl-4 text-[12.5px] leading-relaxed text-text-tertiary">
+            <li>Retire ton numéro de téléphone et ton 2ᵉ e-mail du compte</li>
+            <li>
+              Désactive la double authentification (2FA) et les codes envoyés
+              par SMS
+            </li>
+            <li>Change tout mot de passe temporaire par le mot de passe final</li>
+          </ul>
           <textarea
             required
             value={credentials}

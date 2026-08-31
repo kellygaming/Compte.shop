@@ -188,6 +188,20 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
 
       {deliveryType === "instant" ? (
         <Field label="Email + mot de passe à donner à l'acheteur">
+          <p className="mb-1.5 text-[12.5px] leading-relaxed text-text-tertiary">
+            Ceci sera envoyé automatiquement à l&apos;acheteur dès qu&apos;il
+            paie — personne ne pourra te contacter pour le débloquer.
+            Avant de publier, prépare le compte pour qu&apos;il puisse se
+            connecter seul, sans toi :
+          </p>
+          <ul className="mb-2 list-disc pl-4 text-[12.5px] leading-relaxed text-text-tertiary">
+            <li>Retire ton numéro de téléphone et ton 2ᵉ e-mail du compte</li>
+            <li>
+              Désactive la double authentification (2FA) et les codes envoyés
+              par SMS
+            </li>
+            <li>Change tout mot de passe temporaire par le mot de passe final</li>
+          </ul>
           <textarea
             required
             value={credentials}
