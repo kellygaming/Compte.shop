@@ -86,12 +86,20 @@ export default async function DashboardPage() {
                 <div className="mb-2 line-clamp-2 font-display text-base font-semibold">
                   {listing.title}
                 </div>
-                <div className="text-[15px] font-semibold">
+                <div className="mb-2 text-[15px] font-semibold">
                   {formatAmount(listing.price_xof)}{" "}
                   <span className="text-xs font-normal text-text-secondary">
                     F CFA
                   </span>
                 </div>
+                {listing.status === "live" ? (
+                  <Link
+                    href={`/tableau-de-bord/annonces/${listing.id}`}
+                    className="text-[12.5px] font-medium text-accent hover:underline"
+                  >
+                    Modifier le prix
+                  </Link>
+                ) : null}
               </div>
             ))}
           </div>

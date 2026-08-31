@@ -59,7 +59,7 @@ export async function POST(
     .update({ status: "held" })
     .eq("id", orderId)
     .eq("status", "pending_payment")
-    .select("id");
+    .select("id, listing_id");
 
   if (heldOrders && heldOrders.length > 0) {
     await db
@@ -71,6 +71,18 @@ export async function POST(
       })
       .eq("order_id", orderId)
       .eq("status", "pending");
+
+    // L'annonce ne doit plus pouvoir être achetée une fois payée. Garde
+    // status='live' : un rejeu du webhook ne repasse jamais une annonce
+    // déjà marquée vendue (heldOrders serait de toute façon vide).
+    const listingId = heldOrders[0].listing_id;
+    if (listingId) {
+      await db
+        .from("listings")
+        .update({ status: "sold" })
+        .eq("id", listingId)
+        .eq("status", "live");
+    }
   }
   // heldOrders vide = commande inconnue, déjà traitée, ou hors séquence :
   // no-op silencieux, c'est la protection contre le rejeu et la fraude.

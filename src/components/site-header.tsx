@@ -19,6 +19,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [pseudo, setPseudo] = useState<string | null | undefined>(undefined);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -27,15 +28,16 @@ export function SiteHeader() {
       if (!userId) {
         setPseudo(null);
         setIsAdmin(false);
+        setIsSeller(false);
         return;
       }
-      const { data } = await supabase
-        .from("profiles")
-        .select("pseudo, role")
-        .eq("id", userId)
-        .maybeSingle();
-      setPseudo(data?.pseudo ?? null);
-      setIsAdmin(data?.role === "admin");
+      const [{ data: profile }, { data: seller }] = await Promise.all([
+        supabase.from("profiles").select("pseudo, role").eq("id", userId).maybeSingle(),
+        supabase.from("sellers").select("profile_id").eq("profile_id", userId).maybeSingle(),
+      ]);
+      setPseudo(profile?.pseudo ?? null);
+      setIsAdmin(profile?.role === "admin");
+      setIsSeller(Boolean(seller));
     }
 
     supabase.auth.getUser().then(({ data }) => loadProfile(data.user?.id));
@@ -105,10 +107,10 @@ export function SiteHeader() {
             </Link>
           )}
           <Link
-            href="/vendre"
+            href={isSeller ? "/tableau-de-bord" : "/vendre"}
             className="rounded-[9px] bg-accent px-[18px] py-2.5 text-[13.5px] font-semibold text-bg hover:bg-accent-hover"
           >
-            Devenir vendeur
+            {isSeller ? "Mes annonces" : "Devenir vendeur"}
           </Link>
         </div>
 
@@ -175,11 +177,11 @@ export function SiteHeader() {
               </Link>
             )}
             <Link
-              href="/vendre"
+              href={isSeller ? "/tableau-de-bord" : "/vendre"}
               onClick={() => setOpen(false)}
               className="flex min-h-11 items-center justify-center rounded-[9px] bg-accent px-[18px] text-[13.5px] font-semibold text-bg"
             >
-              Devenir vendeur
+              {isSeller ? "Mes annonces" : "Devenir vendeur"}
             </Link>
           </div>
         </div>
