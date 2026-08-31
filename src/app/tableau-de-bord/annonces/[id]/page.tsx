@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { EditListingForm } from "./edit-form";
 
 export default async function EditListingPage({
@@ -29,6 +30,20 @@ export default async function EditListingPage({
     notFound();
   }
 
+  // Table listing_credentials sans policy RLS cliente par conception : le
+  // client de session ne peut pas la lire, seul le rôle service le peut,
+  // ici après avoir déjà vérifié l'appartenance de l'annonce ci-dessus.
+  let existingCredentials = "";
+  if (listing.delivery_type === "instant") {
+    const db = createServiceClient();
+    const { data: creds } = await db
+      .from("listing_credentials")
+      .select("credentials")
+      .eq("listing_id", listing.id)
+      .maybeSingle();
+    existingCredentials = creds?.credentials ?? "";
+  }
+
   return (
     <>
       <SiteHeader />
@@ -51,6 +66,7 @@ export default async function EditListingPage({
             initialDescription={listing.description ?? ""}
             initialDeliveryType={listing.delivery_type}
             initialDeliveryInstructions={listing.delivery_instructions ?? ""}
+            initialCredentials={existingCredentials}
           />
         )}
       </main>

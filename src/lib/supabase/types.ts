@@ -133,6 +133,32 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_credentials: {
+        Row: {
+          credentials: string
+          listing_id: string
+          updated_at: string
+        }
+        Insert: {
+          credentials?: string
+          listing_id: string
+          updated_at?: string
+        }
+        Update: {
+          credentials?: string
+          listing_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_credentials_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listings: {
         Row: {
           created_at: string

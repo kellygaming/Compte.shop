@@ -146,6 +146,13 @@ export function OrderPanel({
           <p className="mb-3 text-[13.5px] text-text-secondary">
             Transmettez les identifiants du compte à l&apos;acheteur.
           </p>
+          {order.confirm_deadline ? (
+            <p className="mb-3 text-[13px] text-text-tertiary">
+              Vous devez livrer avant le{" "}
+              {new Date(order.confirm_deadline).toLocaleString("fr-FR")}, sinon
+              l&apos;acheteur est remboursé automatiquement.
+            </p>
+          ) : null}
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
@@ -167,6 +174,13 @@ export function OrderPanel({
       {status === "held" && !order.delivered_at && role === "buyer" ? (
         <div className="rounded-2xl border border-border-soft bg-surface p-6 text-sm text-text-secondary">
           En attente que le vendeur transmette les accès.
+          {order.confirm_deadline ? (
+            <p className="mt-2 text-[13px] text-text-tertiary">
+              S&apos;il ne livre pas avant le{" "}
+              {new Date(order.confirm_deadline).toLocaleString("fr-FR")}, vous
+              êtes remboursé automatiquement.
+            </p>
+          ) : null}
         </div>
       ) : null}
 

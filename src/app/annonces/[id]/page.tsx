@@ -101,19 +101,19 @@ export default async function ListingDetailPage({
               <div className="flex items-center justify-between py-2.5">
                 <dt className="text-text-tertiary">Remise du compte</dt>
                 <dd className="text-text">
-                  {isInstantDelivery ? "Instantanée" : "Manuelle"}
+                  {isInstantDelivery ? "Email + mot de passe" : "Vendeur présent après l'achat"}
                 </dd>
               </div>
               <div className="flex items-center justify-between py-2.5">
-                <dt className="text-text-tertiary">Vérification acheteur</dt>
-                <dd className="text-text">48 h après réception</dd>
+                <dt className="text-text-tertiary">Garantie</dt>
+                <dd className="text-text">Remboursé si problème</dd>
               </div>
             </dl>
 
             {listing.delivery_instructions ? (
               <div className="mb-5 rounded-lg bg-bg px-3.5 py-3">
                 <div className="mb-1 font-mono-ui text-[10.5px] uppercase tracking-[0.04em] text-text-tertiary">
-                  Ce que dit le vendeur sur la remise
+                  Message du vendeur sur la remise
                 </div>
                 <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-text-secondary">
                   {listing.delivery_instructions}
@@ -122,9 +122,9 @@ export default async function ListingDetailPage({
             ) : null}
 
             <p className="mb-5 text-[13px] leading-relaxed text-text-tertiary">
-              Paiement bloqué en séquestre jusqu&apos;à confirmation. Vous
-              disposez de 48 h après réception des accès pour vérifier le
-              compte.
+              {isInstantDelivery
+                ? "Vous recevez l'email et le mot de passe juste après le paiement. Vous avez 48 h pour vérifier que le compte fonctionne — remboursé sinon."
+                : "Le vendeur doit vous donner le compte après votre achat. S'il ne le fait pas à temps, vous êtes remboursé automatiquement. Une fois le compte reçu, vous avez 48 h pour vérifier qu'il fonctionne."}
             </p>
             {isOwnListing ? (
               <div className="rounded-lg border border-border-soft px-4 py-3 text-sm text-text-secondary">

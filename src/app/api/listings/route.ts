@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 
 /**
  * Création d'annonce. Utilise le client de session (pas le service
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
     images?: string[];
     delivery_type?: string;
     delivery_instructions?: string;
+    credentials?: string;
   };
   try {
     payload = await request.json();
@@ -37,6 +39,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Champs manquants ou invalides." }, { status: 400 });
   }
   const deliveryType = payload.delivery_type === "manual" ? "manual" : "instant";
+  if (deliveryType === "instant" && !payload.credentials?.trim()) {
+    return NextResponse.json(
+      { error: "Indiquez l'email et le mot de passe à transmettre à l'acheteur." },
+      { status: 400 },
+    );
+  }
 
   const { data: listing, error } = await supabase
     .from("listings")
@@ -62,6 +70,16 @@ export async function POST(request: Request) {
       },
       { status: 403 },
     );
+  }
+
+  if (deliveryType === "instant" && payload.credentials?.trim()) {
+    // Table séparée, sans policy RLS cliente (voir migration) : seul le
+    // rôle service peut écrire les identifiants, jamais exposés via la
+    // policy publique de lecture des annonces.
+    const db = createServiceClient();
+    await db
+      .from("listing_credentials")
+      .insert({ listing_id: listing.id, credentials: payload.credentials.trim() });
   }
 
   return NextResponse.json({ id: listing.id });

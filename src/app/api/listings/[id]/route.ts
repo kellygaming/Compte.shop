@@ -28,6 +28,7 @@ export async function PATCH(
     description?: string;
     delivery_type?: string;
     delivery_instructions?: string;
+    credentials?: string;
   };
   try {
     payload = await request.json();
@@ -56,7 +57,7 @@ export async function PATCH(
   if (payload.delivery_instructions !== undefined) {
     update.delivery_instructions = payload.delivery_instructions;
   }
-  if (Object.keys(update).length === 0) {
+  if (Object.keys(update).length === 0 && payload.credentials === undefined) {
     return NextResponse.json({ error: "Rien à modifier." }, { status: 400 });
   }
 
@@ -64,7 +65,7 @@ export async function PATCH(
 
   const { data: listing } = await db
     .from("listings")
-    .select("id, seller_id, status")
+    .select("id, seller_id, status, delivery_type")
     .eq("id", id)
     .maybeSingle();
 
@@ -81,9 +82,29 @@ export async function PATCH(
     );
   }
 
-  const { error } = await db.from("listings").update(update).eq("id", id);
-  if (error) {
-    return NextResponse.json({ error: "Échec de la mise à jour." }, { status: 500 });
+  const resultingDeliveryType = update.delivery_type ?? listing.delivery_type;
+  if (
+    resultingDeliveryType === "instant" &&
+    payload.credentials !== undefined &&
+    !payload.credentials.trim()
+  ) {
+    return NextResponse.json(
+      { error: "Indiquez l'email et le mot de passe à transmettre à l'acheteur." },
+      { status: 400 },
+    );
+  }
+
+  if (Object.keys(update).length > 0) {
+    const { error } = await db.from("listings").update(update).eq("id", id);
+    if (error) {
+      return NextResponse.json({ error: "Échec de la mise à jour." }, { status: 500 });
+    }
+  }
+
+  if (payload.credentials !== undefined && payload.credentials.trim()) {
+    await db
+      .from("listing_credentials")
+      .upsert({ listing_id: id, credentials: payload.credentials.trim() });
   }
 
   return NextResponse.json({ ok: true });

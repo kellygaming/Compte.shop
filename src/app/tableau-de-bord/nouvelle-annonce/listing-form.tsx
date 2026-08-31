@@ -19,6 +19,7 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
   const [images, setImages] = useState<FileList | null>(null);
   const [deliveryType, setDeliveryType] = useState<"instant" | "manual">("instant");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
+  const [credentials, setCredentials] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +34,10 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
     }
     if (!images || images.length === 0) {
       setError("Au moins une photo est requise.");
+      return;
+    }
+    if (deliveryType === "instant" && !credentials.trim()) {
+      setError("Indiquez l'email et le mot de passe à donner à l'acheteur.");
       return;
     }
 
@@ -68,6 +73,7 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
           images: imageUrls,
           delivery_type: deliveryType,
           delivery_instructions: deliveryInstructions,
+          credentials,
         }),
       });
       const data = await response.json();
@@ -135,7 +141,16 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
           className={fileClass}
         />
       </Field>
-      <Field label="Comment se passera la remise du compte ?">
+      <div className="flex flex-col gap-1.5 text-[13px] text-text-secondary">
+        <div className="font-semibold text-text">
+          Comment vas-tu donner le compte à l&apos;acheteur ?
+        </div>
+        <p className="mb-1 text-[12.5px] leading-relaxed text-text-tertiary">
+          C&apos;est écrit sur l&apos;annonce, la personne le voit avant
+          d&apos;acheter. Aura-t-elle un email + mot de passe pour se
+          connecter seule, même sans toi ? Ou dois-tu être présent pour lui
+          donner le compte toi-même ?
+        </p>
         <div className="flex gap-2">
           <button
             type="button"
@@ -146,10 +161,10 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
                 : "border-border-strong text-text-secondary"
             }`}
           >
-            <div className="font-semibold">Instantané</div>
+            <div className="font-semibold">Email + mot de passe</div>
             <div className="text-[12px] text-text-tertiary">
-              Vous transmettez identifiant + mot de passe dès l&apos;achat,
-              l&apos;acheteur se connecte seul.
+              Elle reçoit les accès juste après le paiement et se connecte
+              seule, sans toi.
             </div>
           </button>
           <button
@@ -161,15 +176,33 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
                 : "border-border-strong text-text-secondary"
             }`}
           >
-            <div className="font-semibold">Manuel</div>
+            <div className="font-semibold">Je dois être présent</div>
             <div className="text-[12px] text-text-tertiary">
-              Votre présence est nécessaire pour finaliser le transfert
-              après l&apos;achat.
+              Tu dois être disponible après l&apos;achat pour lui donner le
+              compte toi-même. Si tu n&apos;es pas là à temps, l&apos;acheteur
+              est remboursé.
             </div>
           </button>
         </div>
-      </Field>
-      <Field label="Précisions sur la remise (affiché avant l'achat)">
+      </div>
+
+      {deliveryType === "instant" ? (
+        <Field label="Email + mot de passe à donner à l'acheteur">
+          <textarea
+            required
+            value={credentials}
+            onChange={(e) => setCredentials(e.target.value)}
+            rows={3}
+            className={inputClass}
+            placeholder="email@exemple.com / motdepasse123"
+          />
+          <span className="mt-1 block text-[12px] text-text-tertiary">
+            L&apos;acheteur verra ce message juste après avoir payé. Personne
+            d&apos;autre ne peut le voir.
+          </span>
+        </Field>
+      ) : null}
+      <Field label="Un message pour l'acheteur (affiché avant l'achat, optionnel)">
         <textarea
           value={deliveryInstructions}
           onChange={(e) => setDeliveryInstructions(e.target.value)}
@@ -177,8 +210,8 @@ export function ListingForm({ games }: { games: { slug: string; name: string }[]
           className={inputClass}
           placeholder={
             deliveryType === "instant"
-              ? "Ex. Email + mot de passe. Après ton achat tu reçois les identifiants, connecte-toi et profite."
-              : "Ex. Email + mot de passe. Après ton achat je dois être présent pour te donner accès complet — laisse un message, je serai disponible."
+              ? "Ex. Après ton achat tu reçois l'email et le mot de passe, connecte-toi et profite."
+              : "Ex. Après ton achat je dois être présent pour te donner accès complet — laisse un message, je serai disponible."
           }
         />
       </Field>

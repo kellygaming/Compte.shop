@@ -12,12 +12,14 @@ export function EditListingForm({
   initialDescription,
   initialDeliveryType,
   initialDeliveryInstructions,
+  initialCredentials,
 }: {
   listingId: string;
   initialPriceXOF: number;
   initialDescription: string;
   initialDeliveryType: string;
   initialDeliveryInstructions: string;
+  initialCredentials: string;
 }) {
   const router = useRouter();
   const [priceXOF, setPriceXOF] = useState(String(initialPriceXOF));
@@ -26,6 +28,7 @@ export function EditListingForm({
     initialDeliveryType === "manual" ? "manual" : "instant",
   );
   const [deliveryInstructions, setDeliveryInstructions] = useState(initialDeliveryInstructions);
+  const [credentials, setCredentials] = useState(initialCredentials);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,6 +39,10 @@ export function EditListingForm({
     const price = Number(priceXOF);
     if (!Number.isFinite(price) || price <= 0) {
       setError("Prix invalide.");
+      return;
+    }
+    if (deliveryType === "instant" && !credentials.trim()) {
+      setError("Indiquez l'email et le mot de passe à donner à l'acheteur.");
       return;
     }
 
@@ -49,6 +56,7 @@ export function EditListingForm({
           description,
           delivery_type: deliveryType,
           delivery_instructions: deliveryInstructions,
+          credentials,
         }),
       });
       const data = await response.json();
@@ -86,7 +94,15 @@ export function EditListingForm({
         />
       </label>
       <div className="flex flex-col gap-1.5 text-[13px] text-text-secondary">
-        Comment se passera la remise du compte ?
+        <div className="font-semibold text-text">
+          Comment vas-tu donner le compte à l&apos;acheteur ?
+        </div>
+        <p className="mb-1 text-[12.5px] leading-relaxed text-text-tertiary">
+          C&apos;est écrit sur l&apos;annonce, la personne le voit avant
+          d&apos;acheter. Aura-t-elle un email + mot de passe pour se
+          connecter seule, même sans toi ? Ou dois-tu être présent pour lui
+          donner le compte toi-même ?
+        </p>
         <div className="flex gap-2">
           <button
             type="button"
@@ -97,7 +113,11 @@ export function EditListingForm({
                 : "border-border-strong text-text-secondary"
             }`}
           >
-            <div className="font-semibold">Instantané</div>
+            <div className="font-semibold">Email + mot de passe</div>
+            <div className="text-[12px] text-text-tertiary">
+              Elle reçoit les accès juste après le paiement et se connecte
+              seule, sans toi.
+            </div>
           </button>
           <button
             type="button"
@@ -108,12 +128,35 @@ export function EditListingForm({
                 : "border-border-strong text-text-secondary"
             }`}
           >
-            <div className="font-semibold">Manuel</div>
+            <div className="font-semibold">Je dois être présent</div>
+            <div className="text-[12px] text-text-tertiary">
+              Tu dois être disponible après l&apos;achat pour lui donner le
+              compte toi-même. Si tu n&apos;es pas là à temps, l&apos;acheteur
+              est remboursé.
+            </div>
           </button>
         </div>
       </div>
+
+      {deliveryType === "instant" ? (
+        <label className="flex flex-col gap-1.5 text-[13px] text-text-secondary">
+          Email + mot de passe à donner à l&apos;acheteur
+          <textarea
+            required
+            value={credentials}
+            onChange={(e) => setCredentials(e.target.value)}
+            rows={3}
+            className={inputClass}
+            placeholder="email@exemple.com / motdepasse123"
+          />
+          <span className="text-[12px] text-text-tertiary">
+            L&apos;acheteur verra ce message juste après avoir payé. Personne
+            d&apos;autre ne peut le voir.
+          </span>
+        </label>
+      ) : null}
       <label className="flex flex-col gap-1.5 text-[13px] text-text-secondary">
-        Précisions sur la remise (affiché avant l&apos;achat)
+        Un message pour l&apos;acheteur (affiché avant l&apos;achat, optionnel)
         <textarea
           value={deliveryInstructions}
           onChange={(e) => setDeliveryInstructions(e.target.value)}

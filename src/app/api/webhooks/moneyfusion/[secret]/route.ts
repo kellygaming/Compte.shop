@@ -3,6 +3,9 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import type { MoneyFusionWebhookPayload } from "@/lib/moneyfusion";
 
+const CONFIRM_WINDOW_HOURS = 48;
+const SELLER_DELIVERY_WINDOW_HOURS = 24;
+
 /**
  * Webhook MoneyFusion — confirmation de paiement.
  *
@@ -77,11 +80,56 @@ export async function POST(
     // déjà marquée vendue (heldOrders serait de toute façon vide).
     const listingId = heldOrders[0].listing_id;
     if (listingId) {
+      const { data: listingRow } = await db
+        .from("listings")
+        .select("delivery_type, delivery_instructions")
+        .eq("id", listingId)
+        .maybeSingle();
+
       await db
         .from("listings")
         .update({ status: "sold" })
         .eq("id", listingId)
         .eq("status", "live");
+
+      const now = new Date();
+      if (listingRow?.delivery_type === "manual") {
+        // Remise manuelle : le vendeur doit se rendre disponible. S'il ne
+        // livre pas avant l'expiration, releaseExpiredOrders() rembourse
+        // automatiquement (voir src/lib/orders.ts).
+        const deadline = new Date(
+          now.getTime() + SELLER_DELIVERY_WINDOW_HOURS * 60 * 60 * 1000,
+        );
+        await db
+          .from("orders")
+          .update({ confirm_deadline: deadline.toISOString() })
+          .eq("id", orderId)
+          .eq("status", "held");
+      } else {
+        // Remise instantanée : les identifiants saisis par le vendeur à la
+        // publication sont transmis tout de suite, pas d'attente du
+        // vendeur. Le délai de vérification acheteur démarre ici.
+        const { data: creds } = await db
+          .from("listing_credentials")
+          .select("credentials")
+          .eq("listing_id", listingId)
+          .maybeSingle();
+        const deadline = new Date(
+          now.getTime() + CONFIRM_WINDOW_HOURS * 60 * 60 * 1000,
+        );
+        const note = [creds?.credentials, listingRow?.delivery_instructions]
+          .filter((part) => part && part.trim())
+          .join("\n\n");
+        await db
+          .from("orders")
+          .update({
+            delivered_at: now.toISOString(),
+            confirm_deadline: deadline.toISOString(),
+            delivery_note: note || null,
+          })
+          .eq("id", orderId)
+          .eq("status", "held");
+      }
     }
   }
   // heldOrders vide = commande inconnue, déjà traitée, ou hors séquence :
