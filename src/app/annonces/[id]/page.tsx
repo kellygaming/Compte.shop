@@ -41,6 +41,16 @@ export default async function ListingDetailPage({
   const sellerPseudo = seller?.profiles?.pseudo ?? "Vendeur vérifié";
   const isOwnListing = auth.user?.id === listing.seller_id;
 
+  let buyerPhone: string | null = null;
+  if (auth.user) {
+    const { data: buyerProfile } = await supabase
+      .from("profiles")
+      .select("phone")
+      .eq("id", auth.user.id)
+      .maybeSingle();
+    buyerPhone = buyerProfile?.phone ?? null;
+  }
+
   return (
     <>
       <SiteHeader />
@@ -85,7 +95,11 @@ export default async function ListingDetailPage({
                 Ceci est votre annonce.
               </div>
             ) : (
-              <BuyButton listingId={listing.id} isAuthenticated={Boolean(auth.user)} />
+              <BuyButton
+                listingId={listing.id}
+                isAuthenticated={Boolean(auth.user)}
+                defaultPhone={buyerPhone}
+              />
             )}
           </aside>
         </div>
