@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { releaseExpiredOrders } from "@/lib/orders";
+import { releaseExpiredOrders, reconcilePendingOrder } from "@/lib/orders";
 
 /**
  * Statut d'une commande, pour la page de retour de paiement (polling
  * léger le temps que le webhook MoneyFusion arrive) et le rafraîchissement
  * après une action. RLS restreint déjà la lecture à l'acheteur ou au
  * vendeur concernés.
+ *
+ * reconcilePendingOrder() interroge directement MoneyFusion si la
+ * commande est encore pending_payment : le webhook n'est pas fiable à
+ * 100%, ce polling (déjà en place côté page) sert aussi de filet de
+ * sécurité au lieu d'attendre passivement un webhook qui peut ne jamais
+ * arriver.
  */
 export async function GET(
   _request: Request,
@@ -22,6 +28,7 @@ export async function GET(
     return NextResponse.json({ error: "Connexion requise." }, { status: 401 });
   }
 
+  await reconcilePendingOrder(id);
   await releaseExpiredOrders();
 
   const { data: order, error } = await supabase

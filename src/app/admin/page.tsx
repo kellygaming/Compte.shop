@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getAdminUser } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
+import { minutesAgoISOString } from "@/lib/orders";
 
 export default async function AdminHomePage() {
   const admin = await getAdminUser();
@@ -12,14 +13,21 @@ export default async function AdminHomePage() {
   }
 
   const db = createServiceClient();
-  const [{ count: openDisputes }, { count: pendingPayouts }] = await Promise.all([
-    db.from("disputes").select("id", { count: "exact", head: true }).eq("status", "open"),
-    db
-      .from("orders")
-      .select("id", { count: "exact", head: true })
-      .not("payout_requested_at", "is", null)
-      .is("paid_out_at", null),
-  ]);
+  const fiveMinutesAgo = minutesAgoISOString(5);
+  const [{ count: openDisputes }, { count: pendingPayouts }, { count: stuckPayments }] =
+    await Promise.all([
+      db.from("disputes").select("id", { count: "exact", head: true }).eq("status", "open"),
+      db
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .not("payout_requested_at", "is", null)
+        .is("paid_out_at", null),
+      db
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "pending_payment")
+        .lt("created_at", fiveMinutesAgo),
+    ]);
 
   return (
     <>
@@ -29,6 +37,17 @@ export default async function AdminHomePage() {
           Administration
         </h1>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Link
+            href="/admin/commandes"
+            className={`rounded-2xl border p-6 hover:border-border-hover ${
+              stuckPayments ? "border-accent bg-accent/5" : "border-border-soft bg-surface"
+            }`}
+          >
+            <div className="mb-1 font-display text-lg font-semibold">Commandes &amp; paiements</div>
+            <div className="text-sm text-text-secondary">
+              {stuckPayments ? `${stuckPayments} paiement(s) bloqué(s)` : "Tout est à jour"}
+            </div>
+          </Link>
           <Link
             href="/admin/litiges"
             className="rounded-2xl border border-border-soft bg-surface p-6 hover:border-border-hover"

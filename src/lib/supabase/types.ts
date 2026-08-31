@@ -308,6 +308,7 @@ export type Database = {
           order_id: string
           provider: string
           provider_reference: string | null
+          provider_token: string | null
           raw_payload: Json | null
           status: string
           updated_at: string
@@ -320,6 +321,7 @@ export type Database = {
           order_id: string
           provider?: string
           provider_reference?: string | null
+          provider_token?: string | null
           raw_payload?: Json | null
           status?: string
           updated_at?: string
@@ -332,6 +334,7 @@ export type Database = {
           order_id?: string
           provider?: string
           provider_reference?: string | null
+          provider_token?: string | null
           raw_payload?: Json | null
           status?: string
           updated_at?: string

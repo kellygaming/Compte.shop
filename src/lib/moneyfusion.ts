@@ -26,6 +26,7 @@ export type InitiatePaymentInput = {
 
 type MoneyFusionPayResponse = {
   statut: boolean;
+  token?: string;
   url?: string;
   message?: string;
 };
@@ -34,6 +35,15 @@ export type MoneyFusionWebhookPayload = {
   event: string;
   transaction_id: string;
   personal_Info?: Array<Record<string, string>>;
+};
+
+type MoneyFusionStatusResponse = {
+  statut: boolean;
+  data?: {
+    statut: "pending" | "failure" | "no paid" | "paid" | string;
+    numeroTransaction?: string;
+  };
+  message?: string;
 };
 
 function getPayEndpoint(): string {
@@ -51,7 +61,7 @@ function getPayEndpoint(): string {
 
 export async function initiateMoneyFusionPayment(
   input: InitiatePaymentInput,
-): Promise<{ paymentUrl: string }> {
+): Promise<{ paymentUrl: string; token: string | null }> {
   const endpoint = getPayEndpoint();
 
   const body = {
@@ -99,5 +109,26 @@ export async function initiateMoneyFusionPayment(
     );
   }
 
-  return { paymentUrl: data.url };
+  return { paymentUrl: data.url, token: data.token ?? null };
+}
+
+/**
+ * Interroge directement l'état d'un paiement (endpoint documenté,
+ * indépendant du webhook). Sert de filet de sécurité : le webhook
+ * MoneyFusion n'est pas fiable à 100 % (déjà silencieusement absent en
+ * pratique), donc /api/orders/[id] et la tâche planifiée s'en servent
+ * pour réconcilier une commande restée bloquée en pending_payment.
+ */
+export async function checkMoneyFusionPaymentStatus(
+  token: string,
+): Promise<{ paid: boolean; transactionId: string | null }> {
+  const response = await fetch(`https://pay.moneyfusion.net/paiementNotif/${token}`);
+  if (!response.ok) {
+    throw new Error(`MoneyFusion a répondu ${response.status} à la vérification du statut.`);
+  }
+  const data = (await response.json()) as MoneyFusionStatusResponse;
+  return {
+    paid: data.data?.statut === "paid",
+    transactionId: data.data?.numeroTransaction ?? null,
+  };
 }

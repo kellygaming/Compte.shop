@@ -118,7 +118,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { paymentUrl } = await initiateMoneyFusionPayment({
+    const { paymentUrl, token } = await initiateMoneyFusionPayment({
       totalPriceXOF: listing.price_xof,
       article: [{ [listing.title]: listing.price_xof }],
       numeroSend,
@@ -128,6 +128,15 @@ export async function POST(request: Request) {
       returnUrl: `${origin}/commandes/${order.id}`,
       webhookUrl: `${origin}/api/webhooks/moneyfusion/${webhookSecret}`,
     });
+
+    if (token) {
+      // Filet de sécurité si le webhook n'arrive jamais — voir
+      // reconcilePendingOrder dans src/lib/orders.ts.
+      await db
+        .from("payment_transactions")
+        .update({ provider_token: token })
+        .eq("order_id", order.id);
+    }
 
     return NextResponse.json({ orderId: order.id, paymentUrl });
   } catch (err) {
