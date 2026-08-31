@@ -89,6 +89,9 @@ export function SiteHeader() {
                   Admin
                 </Link>
               ) : null}
+              <Link href="/mes-achats" className="text-[13.5px] text-text-secondary hover:text-text">
+                Mes achats
+              </Link>
               <span className="text-[13.5px] text-text-secondary">{pseudo}</span>
               <button
                 type="button"
@@ -156,6 +159,13 @@ export function SiteHeader() {
                     Admin
                   </Link>
                 ) : null}
+                <Link
+                  href="/mes-achats"
+                  onClick={() => setOpen(false)}
+                  className="flex min-h-11 items-center text-[15px] text-text-secondary hover:text-text"
+                >
+                  Mes achats
+                </Link>
                 <span className="text-[13.5px] text-text-secondary">
                   Connecté en tant que {pseudo}
                 </span>
