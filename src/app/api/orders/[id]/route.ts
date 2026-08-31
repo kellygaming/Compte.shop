@@ -34,7 +34,7 @@ export async function GET(
   const { data: order, error } = await supabase
     .from("orders")
     .select(
-      "id, status, amount_xof, created_at, buyer_id, seller_id, delivered_at, confirm_deadline, delivery_note",
+      "id, status, amount_xof, created_at, buyer_id, seller_id, delivered_at, confirm_deadline, delivery_note, seller_confirmed_at, payout_requested_at, payout_phone, paid_out_at",
     )
     .eq("id", id)
     .maybeSingle();

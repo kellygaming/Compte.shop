@@ -16,7 +16,7 @@ export default async function AdminPayoutsPage() {
   const { data: orders } = await db
     .from("orders")
     .select(
-      "id, amount_xof, payout_requested_at, seller_id, sellers(profiles(pseudo, phone))",
+      "id, amount_xof, payout_requested_at, payout_phone, seller_id, sellers(profiles(pseudo, phone))",
     )
     .not("payout_requested_at", "is", null)
     .is("paid_out_at", null)
@@ -46,7 +46,9 @@ export default async function AdminPayoutsPage() {
                   </div>
                   <div className="text-[13px] text-text-tertiary">
                     {order.sellers?.profiles?.pseudo ?? "Vendeur"} ·{" "}
-                    {order.sellers?.profiles?.phone ?? "téléphone non renseigné"}
+                    <span className="font-semibold text-text">
+                      {order.payout_phone ?? order.sellers?.profiles?.phone ?? "téléphone non renseigné"}
+                    </span>
                   </div>
                 </div>
                 <MarkPaidButton orderId={order.id} />

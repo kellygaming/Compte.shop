@@ -23,6 +23,7 @@ type Order = {
   delivery_note: string | null;
   seller_confirmed_at: string | null;
   payout_requested_at: string | null;
+  payout_phone: string | null;
   paid_out_at: string | null;
 };
 
@@ -65,6 +66,7 @@ export function OrderPanel({
   const [disputeOpen, setDisputeOpen] = useState(false);
   const [disputeReason, setDisputeReason] = useState("");
   const [escalated, setEscalated] = useState(Boolean(dispute?.escalated_at));
+  const [payoutPhone, setPayoutPhone] = useState("");
 
   const status = isKnownStatus(order.status) ? order.status : "pending_payment";
 
@@ -141,6 +143,20 @@ export function OrderPanel({
     <div className="flex flex-col gap-4">
       <StatusBanner status={status} />
 
+      {role === "buyer" && order.delivery_note ? (
+        <div className="rounded-2xl border border-border-soft bg-surface p-6">
+          <div className="mb-1.5 font-mono-ui text-[11px] uppercase tracking-[0.06em] text-text-tertiary">
+            Accès transmis par le vendeur
+          </div>
+          <p className="whitespace-pre-line rounded-lg bg-bg px-3.5 py-3 text-[13.5px]">
+            {order.delivery_note}
+          </p>
+          <p className="mt-2.5 text-[12.5px] text-text-tertiary">
+            Toujours visible ici si vous en avez besoin plus tard.
+          </p>
+        </div>
+      ) : null}
+
       {status === "held" && !order.delivered_at && role === "seller" ? (
         <div className="rounded-2xl border border-border-soft bg-surface p-6">
           <p className="mb-3 text-[13.5px] text-text-secondary">
@@ -186,16 +202,6 @@ export function OrderPanel({
 
       {status === "held" && order.delivered_at ? (
         <div className="rounded-2xl border border-border-soft bg-surface p-6">
-          {role === "buyer" && order.delivery_note ? (
-            <div className="mb-4">
-              <div className="mb-1.5 font-mono-ui text-[11px] uppercase tracking-[0.06em] text-text-tertiary">
-                Accès transmis par le vendeur
-              </div>
-              <p className="whitespace-pre-line rounded-lg bg-bg px-3.5 py-3 text-[13.5px]">
-                {order.delivery_note}
-              </p>
-            </div>
-          ) : null}
           <p className="mb-4 text-[13px] text-text-tertiary">
             {order.confirm_deadline
               ? `Vous avez jusqu'au ${new Date(order.confirm_deadline).toLocaleString("fr-FR")} pour vérifier le compte.`
@@ -278,22 +284,40 @@ export function OrderPanel({
           ) : order.paid_out_at ? (
             <p className="text-[13.5px] text-text-secondary">Versement effectué.</p>
           ) : order.payout_requested_at ? (
-            <p className="text-[13.5px] text-text-secondary">
-              Versement demandé, en cours de traitement.
-            </p>
+            <div>
+              <p className="text-[13.5px] text-text-secondary">
+                Versement demandé{order.payout_phone ? ` sur le ${order.payout_phone}` : ""}, en
+                cours de traitement.
+              </p>
+              <p className="mt-1.5 text-[12.5px] text-text-tertiary">
+                Le versement peut prendre jusqu&apos;à 24 h.
+              </p>
+            </div>
           ) : (
             <>
               <p className="mb-3 text-[13.5px] text-text-secondary">
-                Vente confirmée. Demandez le versement quand vous êtes prêt.
+                Vente confirmée. Indiquez le numéro Mobile Money qui doit
+                recevoir le versement, avec l&apos;indicatif du pays (ex.
+                +225 07 00 00 00 00) — très important pour qu&apos;on vous
+                paie sur le bon numéro.
               </p>
+              <input
+                value={payoutPhone}
+                onChange={(e) => setPayoutPhone(e.target.value)}
+                className={`${inputClass} mb-3`}
+                placeholder="+225 07 00 00 00 00"
+              />
               <button
                 type="button"
-                disabled={loading}
-                onClick={() => callAction("request-payout")}
+                disabled={loading || !payoutPhone.trim()}
+                onClick={() => callAction("request-payout", { phone: payoutPhone.trim() })}
                 className="rounded-[10px] bg-accent px-5 py-2.5 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
               >
                 {loading ? "…" : "Demander le versement"}
               </button>
+              <p className="mt-2.5 text-[12.5px] text-text-tertiary">
+                Le versement peut prendre jusqu&apos;à 24 h après la demande.
+              </p>
             </>
           )}
         </div>

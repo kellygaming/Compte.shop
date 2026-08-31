@@ -237,6 +237,7 @@ export type Database = {
           id: string
           listing_id: string
           paid_out_at: string | null
+          payout_phone: string | null
           payout_requested_at: string | null
           seller_confirmed_at: string | null
           seller_id: string
@@ -253,6 +254,7 @@ export type Database = {
           id?: string
           listing_id: string
           paid_out_at?: string | null
+          payout_phone?: string | null
           payout_requested_at?: string | null
           seller_confirmed_at?: string | null
           seller_id: string
@@ -269,6 +271,7 @@ export type Database = {
           id?: string
           listing_id?: string
           paid_out_at?: string | null
+          payout_phone?: string | null
           payout_requested_at?: string | null
           seller_confirmed_at?: string | null
           seller_id?: string

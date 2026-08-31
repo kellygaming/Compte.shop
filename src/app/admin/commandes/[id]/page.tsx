@@ -31,7 +31,7 @@ export default async function AdminOrderDetailPage({
   const { data: order } = await db
     .from("orders")
     .select(
-      "id, status, amount_xof, created_at, delivered_at, confirm_deadline, delivery_note, seller_confirmed_at, payout_requested_at, paid_out_at, listing_id, listings(title, delivery_type), profiles!orders_buyer_id_fkey(pseudo, phone), sellers!orders_seller_id_fkey(profiles(pseudo, phone))",
+      "id, status, amount_xof, created_at, delivered_at, confirm_deadline, delivery_note, seller_confirmed_at, payout_requested_at, payout_phone, paid_out_at, listing_id, listings(title, delivery_type), profiles!orders_buyer_id_fkey(pseudo, phone), sellers!orders_seller_id_fkey(profiles(pseudo, phone))",
     )
     .eq("id", id)
     .maybeSingle();
@@ -75,6 +75,12 @@ export default async function AdminOrderDetailPage({
             <div className="text-[13px] text-text-tertiary">
               {order.sellers?.profiles?.phone ?? "téléphone non renseigné"}
             </div>
+            {order.payout_requested_at ? (
+              <div className="mt-2 text-[13px] text-text">
+                Versement demandé sur :{" "}
+                <span className="font-semibold">{order.payout_phone ?? "—"}</span>
+              </div>
+            ) : null}
           </div>
         </div>
 
