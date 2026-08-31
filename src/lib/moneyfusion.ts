@@ -1,9 +1,9 @@
 import "server-only";
 
 /**
- * Client MoneyFusion. Contrat observé sur l'intégration réelle de
- * kelly-gaming (aucune doc publique fiable) :
- * - Le marchand est identifié dans l'URL, pas dans un header.
+ * Client MoneyFusion (doc FusionPay : https://docs.moneyfusion.net/fr/webapi).
+ * - L'URL d'API elle-même identifie le marchand ; elle est fournie telle
+ *   quelle par le tableau de bord, pas un token à insérer dans un gabarit.
  * - La réponse d'initiation ne contient qu'un lien de paiement ; l'API ne
  *   renvoie ni transaction_id ni signature à ce stade — ceux-ci arrivent
  *   plus tard, uniquement via le webhook.
@@ -36,19 +36,23 @@ export type MoneyFusionWebhookPayload = {
   personal_Info?: Array<Record<string, string>>;
 };
 
-function getMerchantToken(): string {
-  const token = process.env.MONEYFUSION_MERCHANT_TOKEN;
-  if (!token) {
+function getPayEndpoint(): string {
+  // Malgré son nom, cette variable contient l'URL d'API complète fournie
+  // par le tableau de bord MoneyFusion (ex.
+  // https://pay.moneyfusion.net/E_commerce/<identifiant>/pay/), pas un
+  // simple identifiant à insérer dans un gabarit — la doc FusionPay est
+  // explicite là-dessus ("Obtenez ceci depuis votre tableau de bord").
+  const endpoint = process.env.MONEYFUSION_MERCHANT_TOKEN;
+  if (!endpoint) {
     throw new Error("MONEYFUSION_MERCHANT_TOKEN manquant côté serveur.");
   }
-  return token;
+  return endpoint;
 }
 
 export async function initiateMoneyFusionPayment(
   input: InitiatePaymentInput,
 ): Promise<{ paymentUrl: string }> {
-  const token = getMerchantToken();
-  const endpoint = `https://pay.moneyfusion.net/E_commerce/${token}/pay/`;
+  const endpoint = getPayEndpoint();
 
   const body = {
     totalPrice: input.totalPriceXOF,
