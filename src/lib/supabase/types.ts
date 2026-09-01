@@ -226,6 +226,39 @@ export type Database = {
           },
         ]
       }
+      order_reads: {
+        Row: {
+          last_read_at: string
+          order_id: string
+          user_id: string
+        }
+        Insert: {
+          last_read_at?: string
+          order_id: string
+          user_id: string
+        }
+        Update: {
+          last_read_at?: string
+          order_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_reads_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_reads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           amount_xof: number

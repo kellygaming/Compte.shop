@@ -123,15 +123,32 @@ export function OrderPanel({
     }
   }
 
-  async function handleEscalate() {
-    if (!dispute) return;
+  async function handleCallAdmin() {
+    if (!disputeReason.trim()) return;
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/disputes/${dispute.id}/escalate`, { method: "POST" });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Une erreur est survenue.");
-      setEscalated(true);
+      let disputeId = dispute?.id;
+      if (!disputeId) {
+        const response = await fetch(`/api/orders/${order.id}/dispute`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: disputeReason.trim() }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error ?? "Une erreur est survenue.");
+        disputeId = data.disputeId;
+        const refreshed = await fetch(`/api/orders/${order.id}`);
+        const refreshedData = await refreshed.json();
+        if (refreshedData.order) setOrder(refreshedData.order);
+      }
+      if (disputeId) {
+        const escResponse = await fetch(`/api/disputes/${disputeId}/escalate`, { method: "POST" });
+        const escData = await escResponse.json();
+        if (!escResponse.ok) throw new Error(escData.error ?? "Une erreur est survenue.");
+        setEscalated(true);
+      }
+      setDisputeOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
@@ -190,7 +207,9 @@ export function OrderPanel({
 
       {status === "held" && !order.delivered_at && role === "buyer" ? (
         <div className="rounded-2xl border border-border-soft bg-surface p-6 text-sm text-text-secondary">
-          En attente que le vendeur transmette les accès.
+          En attente que le vendeur transmette les accès. Vous pouvez lui
+          écrire directement dans la discussion ci-dessous pour vous
+          coordonner.
           {order.confirm_deadline ? (
             <p className="mt-2 text-[13px] text-text-tertiary">
               S&apos;il ne livre pas avant le{" "}
@@ -210,52 +229,14 @@ export function OrderPanel({
           </p>
 
           {role === "buyer" ? (
-            disputeOpen ? (
-              <div>
-                <textarea
-                  value={disputeReason}
-                  onChange={(e) => setDisputeReason(e.target.value)}
-                  rows={3}
-                  className={inputClass}
-                  placeholder="Décrivez le problème (compte inaccessible, description mensongère…)"
-                />
-                <div className="mt-2.5 flex gap-2">
-                  <button
-                    type="button"
-                    disabled={loading || !disputeReason.trim()}
-                    onClick={() => callAction("dispute", { reason: disputeReason })}
-                    className="rounded-[10px] border border-border-strong px-4 py-2 text-[13.5px] hover:border-border-hover disabled:opacity-60"
-                  >
-                    Envoyer le signalement
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDisputeOpen(false)}
-                    className="rounded-[10px] px-4 py-2 text-[13.5px] text-text-tertiary"
-                  >
-                    Annuler
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-2.5">
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={() => callAction("confirm")}
-                  className="rounded-[10px] bg-accent px-5 py-2.5 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
-                >
-                  {loading ? "…" : "Reçu, tout est ok"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDisputeOpen(true)}
-                  className="rounded-[10px] border border-border-strong px-5 py-2.5 text-sm hover:border-border-hover"
-                >
-                  Signaler un problème
-                </button>
-              </div>
-            )
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => callAction("confirm")}
+              className="rounded-[10px] bg-accent px-5 py-2.5 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
+            >
+              {loading ? "…" : "Reçu, tout est ok"}
+            </button>
           ) : (
             <p className="text-[13.5px] text-text-secondary">
               En attente de confirmation de l&apos;acheteur (versement automatique
@@ -328,21 +309,53 @@ export function OrderPanel({
         <OrderThread orderId={order.id} currentUserId={userId} closed={false} />
       ) : null}
 
-      {status === "disputed" && dispute ? (
-        !escalated ? (
-          <button
-            type="button"
-            disabled={loading}
-            onClick={handleEscalate}
-            className="self-start rounded-[10px] border border-border-strong px-5 py-2.5 text-sm hover:border-border-hover disabled:opacity-60"
-          >
-            Appeler un admin
-          </button>
-        ) : (
-          <p className="text-[13px] text-text-tertiary">
-            Un administrateur a été prévenu et va trancher.
-          </p>
-        )
+      {status === "held" || status === "disputed" ? (
+        <div className="rounded-2xl border border-border-soft bg-surface p-6">
+          {escalated ? (
+            <p className="text-[13px] text-text-tertiary">
+              Un administrateur a été prévenu et va trancher.
+            </p>
+          ) : disputeOpen ? (
+            <div>
+              <p className="mb-2 text-[13.5px] text-text-secondary">
+                Décrivez le problème en quelques mots, un admin va être
+                prévenu et pourra lire votre discussion ci-dessus.
+              </p>
+              <textarea
+                value={disputeReason}
+                onChange={(e) => setDisputeReason(e.target.value)}
+                rows={3}
+                className={inputClass}
+                placeholder="Ex. compte inaccessible, vendeur ne répond pas…"
+              />
+              <div className="mt-2.5 flex gap-2">
+                <button
+                  type="button"
+                  disabled={loading || !disputeReason.trim()}
+                  onClick={handleCallAdmin}
+                  className="rounded-[10px] bg-accent px-4 py-2 text-[13.5px] font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
+                >
+                  {loading ? "…" : "Envoyer à l'admin"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDisputeOpen(false)}
+                  className="rounded-[10px] px-4 py-2 text-[13.5px] text-text-tertiary"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setDisputeOpen(true)}
+              className="rounded-[10px] border border-border-strong px-5 py-2.5 text-sm hover:border-border-hover"
+            >
+              Un problème ? Appeler un admin
+            </button>
+          )}
+        </div>
       ) : null}
 
       {error ? <p className="text-[13px] text-text-secondary">{error}</p> : null}

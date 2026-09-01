@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { NotificationBell } from "./notification-bell";
+import { NotificationOptIn } from "./notification-opt-in";
 
 const FIRST_GAME_SLUG = "fortnite";
 
@@ -92,6 +94,7 @@ export function SiteHeader() {
               <Link href="/mes-achats" className="text-[13.5px] text-text-secondary hover:text-text">
                 Mes achats
               </Link>
+              <NotificationBell />
               <span className="text-[13.5px] text-text-secondary">{pseudo}</span>
               <button
                 type="button"
@@ -135,6 +138,8 @@ export function SiteHeader() {
         </button>
       </div>
 
+      {pseudo ? <NotificationOptIn /> : null}
+
       {open ? (
         <div className="flex flex-col gap-1 border-t border-border px-[clamp(16px,4vw,48px)] py-4 md:hidden">
           {navLinks.map((link) => (
@@ -166,9 +171,12 @@ export function SiteHeader() {
                 >
                   Mes achats
                 </Link>
-                <span className="text-[13.5px] text-text-secondary">
-                  Connecté en tant que {pseudo}
-                </span>
+                <div className="flex items-center gap-2">
+                  <NotificationBell />
+                  <span className="text-[13.5px] text-text-secondary">
+                    Connecté en tant que {pseudo}
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={handleSignOut}

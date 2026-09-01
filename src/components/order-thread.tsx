@@ -43,6 +43,12 @@ export function OrderThread({
         .eq("order_id", orderId)
         .order("created_at", { ascending: true });
       if (!cancelled && data) setMessages(data as Message[]);
+
+      // Marque la discussion comme lue jusqu'à maintenant — alimente le
+      // badge de la cloche dans l'en-tête.
+      await supabase
+        .from("order_reads")
+        .upsert({ order_id: orderId, user_id: currentUserId, last_read_at: new Date().toISOString() });
     }
 
     load();
@@ -51,7 +57,7 @@ export function OrderThread({
       cancelled = true;
       clearInterval(interval);
     };
-  }, [orderId]);
+  }, [orderId, currentUserId]);
 
   async function handleSend() {
     if (!body.trim()) return;

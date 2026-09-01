@@ -62,7 +62,11 @@ export async function POST(
     return NextResponse.json({ error: "Impossible d'ouvrir le litige." }, { status: 500 });
   }
 
-  await db.from("disputes").insert({ order_id: id, opened_by: user.id, reason });
+  const { data: newDispute } = await db
+    .from("disputes")
+    .insert({ order_id: id, opened_by: user.id, reason })
+    .select("id")
+    .single();
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, disputeId: newDispute?.id ?? null });
 }
