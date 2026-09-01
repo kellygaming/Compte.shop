@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -49,12 +50,19 @@ export default async function MesAchatsPage() {
                 href={`/commandes/${order.id}`}
                 className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-soft bg-surface p-5 hover:border-border-hover"
               >
-                <div>
-                  <div className="mb-1 font-display text-base font-semibold">
-                    {order.listings?.title ?? "Annonce supprimée"}
-                  </div>
-                  <div className="text-[12.5px] text-text-tertiary">
-                    {new Date(order.created_at).toLocaleString("fr-FR")}
+                <div className="flex items-center gap-3">
+                  {order.listings?.images?.[0] ? (
+                    <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-border-soft bg-media-empty">
+                      <Image src={order.listings.images[0]} alt="" fill sizes="44px" className="object-cover" />
+                    </div>
+                  ) : null}
+                  <div>
+                    <div className="mb-1 font-display text-base font-semibold">
+                      {order.listings?.title ?? "Annonce supprimée"}
+                    </div>
+                    <div className="text-[12.5px] text-text-tertiary">
+                      {new Date(order.created_at).toLocaleString("fr-FR")}
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">

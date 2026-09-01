@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { releaseExpiredOrders } from "@/lib/orders";
 import { formatAmount } from "@/lib/format";
 import { OrderPanel } from "./order-panel";
+import { ImageGallery } from "@/app/annonces/[id]/image-gallery";
 
 export default async function OrderPage({
   params,
@@ -26,7 +27,7 @@ export default async function OrderPage({
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, status, amount_xof, created_at, buyer_id, seller_id, delivered_at, confirm_deadline, delivery_note, seller_confirmed_at, payout_requested_at, payout_phone, paid_out_at",
+      "id, status, amount_xof, created_at, buyer_id, seller_id, delivered_at, confirm_deadline, delivery_note, seller_confirmed_at, payout_requested_at, payout_phone, paid_out_at, listings(title, images)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -57,9 +58,19 @@ export default async function OrderPage({
         <h1 className="mb-2 font-display text-[26px] font-semibold tracking-[-0.02em]">
           Commande
         </h1>
-        <p className="mb-8 text-sm text-text-tertiary">
-          {formatAmount(order.amount_xof)} F CFA
+        <p className="mb-4 text-sm text-text-tertiary">
+          {order.listings?.title ?? "Annonce"} · {formatAmount(order.amount_xof)} F CFA
         </p>
+        {order.listings?.images && order.listings.images.length > 0 ? (
+          <details className="mb-6 rounded-2xl border border-border-soft bg-surface p-4">
+            <summary className="cursor-pointer text-[13px] font-medium text-text-secondary">
+              Voir les photos de l&apos;annonce
+            </summary>
+            <div className="mt-4">
+              <ImageGallery images={order.listings.images} alt={order.listings.title} />
+            </div>
+          </details>
+        ) : null}
         <OrderPanel order={order} role={role} userId={user.id} dispute={dispute} />
       </main>
       <SiteFooter />

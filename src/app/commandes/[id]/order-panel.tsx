@@ -123,6 +123,36 @@ export function OrderPanel({
     }
   }
 
+  async function handleRequestPayout() {
+    if (!payoutPhone.trim()) return;
+    setLoading(true);
+    setError(null);
+    try {
+      if (!order.seller_confirmed_at) {
+        const confirmResponse = await fetch(`/api/orders/${order.id}/seller-confirm`, {
+          method: "POST",
+        });
+        const confirmData = await confirmResponse.json();
+        if (!confirmResponse.ok) throw new Error(confirmData.error ?? "Une erreur est survenue.");
+      }
+      const response = await fetch(`/api/orders/${order.id}/request-payout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: payoutPhone.trim() }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Une erreur est survenue.");
+
+      const refreshed = await fetch(`/api/orders/${order.id}`);
+      const refreshedData = await refreshed.json();
+      if (refreshedData.order) setOrder(refreshedData.order);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleCallAdmin() {
     if (!disputeReason.trim()) return;
     setLoading(true);
@@ -248,22 +278,7 @@ export function OrderPanel({
 
       {status === "released" && role === "seller" ? (
         <div className="rounded-2xl border border-border-soft bg-surface p-6">
-          {!order.seller_confirmed_at ? (
-            <>
-              <p className="mb-3 text-[13.5px] text-text-secondary">
-                L&apos;acheteur a confirmé. Confirmez à votre tour que la vente
-                est actée pour demander le versement.
-              </p>
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => callAction("seller-confirm")}
-                className="rounded-[10px] bg-accent px-5 py-2.5 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
-              >
-                {loading ? "…" : "Je confirme la vente"}
-              </button>
-            </>
-          ) : order.paid_out_at ? (
+          {order.paid_out_at ? (
             <p className="text-[13.5px] text-text-secondary">Versement effectué.</p>
           ) : order.payout_requested_at ? (
             <div>
@@ -278,10 +293,10 @@ export function OrderPanel({
           ) : (
             <>
               <p className="mb-3 text-[13.5px] text-text-secondary">
-                Vente confirmée. Indiquez le numéro Mobile Money qui doit
-                recevoir le versement, avec l&apos;indicatif du pays (ex.
-                +225 07 00 00 00 00) — très important pour qu&apos;on vous
-                paie sur le bon numéro.
+                L&apos;acheteur a confirmé. Indiquez le numéro Mobile Money
+                qui doit recevoir le versement, avec l&apos;indicatif du
+                pays (ex. +225 07 00 00 00 00) — très important pour
+                qu&apos;on vous paie sur le bon numéro.
               </p>
               <input
                 value={payoutPhone}
@@ -292,10 +307,10 @@ export function OrderPanel({
               <button
                 type="button"
                 disabled={loading || !payoutPhone.trim()}
-                onClick={() => callAction("request-payout", { phone: payoutPhone.trim() })}
+                onClick={handleRequestPayout}
                 className="rounded-[10px] bg-accent px-5 py-2.5 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
               >
-                {loading ? "…" : "Demander le versement"}
+                {loading ? "…" : "Demander mon versement"}
               </button>
               <p className="mt-2.5 text-[12.5px] text-text-tertiary">
                 Le versement peut prendre jusqu&apos;à 24 h après la demande.
@@ -309,7 +324,18 @@ export function OrderPanel({
         <OrderThread orderId={order.id} currentUserId={userId} closed={false} />
       ) : null}
 
-      {status === "held" || status === "disputed" ? (
+      {status === "held" && order.delivered_at && role === "buyer" ? (
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => callAction("confirm")}
+          className="self-start rounded-[10px] bg-accent px-5 py-2.5 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
+        >
+          {loading ? "…" : "J'ai reçu mon compte, tout est ok"}
+        </button>
+      ) : null}
+
+      {status === "held" || status === "released" || status === "disputed" ? (
         <div className="rounded-2xl border border-border-soft bg-surface p-6">
           {escalated ? (
             <p className="text-[13px] text-text-tertiary">

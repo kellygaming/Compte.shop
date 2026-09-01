@@ -39,7 +39,7 @@ export default async function DashboardPage() {
 
   const { data: listings } = await supabase
     .from("listings")
-    .select("id, title, price_xof, status, created_at, game_slug")
+    .select("id, title, price_xof, status, created_at, game_slug, orders(id, status)")
     .eq("seller_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -100,6 +100,17 @@ export default async function DashboardPage() {
                     Modifier le prix
                   </Link>
                 ) : null}
+                {(() => {
+                  const order = listing.orders?.find((o) => o.status !== "pending_payment");
+                  return order ? (
+                    <Link
+                      href={`/commandes/${order.id}`}
+                      className="text-[12.5px] font-medium text-accent hover:underline"
+                    >
+                      Voir la commande / demander le versement
+                    </Link>
+                  ) : null;
+                })()}
               </div>
             ))}
           </div>

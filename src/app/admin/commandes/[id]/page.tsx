@@ -5,6 +5,7 @@ import { getAdminUser } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatAmount } from "@/lib/format";
 import { OrderThread } from "@/components/order-thread";
+import { ImageGallery } from "@/app/annonces/[id]/image-gallery";
 import { ReconcileButton } from "./reconcile-button";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -32,7 +33,7 @@ export default async function AdminOrderDetailPage({
   const { data: order } = await db
     .from("orders")
     .select(
-      "id, status, amount_xof, created_at, delivered_at, confirm_deadline, delivery_note, seller_confirmed_at, payout_requested_at, payout_phone, paid_out_at, listing_id, listings(title, delivery_type), profiles!orders_buyer_id_fkey(pseudo, phone), sellers!orders_seller_id_fkey(profiles(pseudo, phone))",
+      "id, status, amount_xof, created_at, delivered_at, confirm_deadline, delivery_note, seller_confirmed_at, payout_requested_at, payout_phone, paid_out_at, listing_id, listings(title, delivery_type, images), profiles!orders_buyer_id_fkey(pseudo, phone), sellers!orders_seller_id_fkey(profiles(pseudo, phone))",
     )
     .eq("id", id)
     .maybeSingle();
@@ -54,9 +55,20 @@ export default async function AdminOrderDetailPage({
         <h1 className="mb-2 font-display text-[26px] font-semibold tracking-[-0.02em]">
           {order.listings?.title ?? "Annonce supprimée"}
         </h1>
-        <p className="mb-8 text-[13px] text-text-tertiary">
+        <p className="mb-4 text-[13px] text-text-tertiary">
           {formatAmount(order.amount_xof)} F CFA · {STATUS_LABELS[order.status] ?? order.status}
         </p>
+
+        {order.listings?.images && order.listings.images.length > 0 ? (
+          <details className="mb-6 rounded-2xl border border-border-soft bg-surface p-4">
+            <summary className="cursor-pointer text-[13px] font-medium text-text-secondary">
+              Voir les photos de l&apos;annonce
+            </summary>
+            <div className="mt-4">
+              <ImageGallery images={order.listings.images} alt={order.listings.title} />
+            </div>
+          </details>
+        ) : null}
 
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-border-soft bg-surface p-5">

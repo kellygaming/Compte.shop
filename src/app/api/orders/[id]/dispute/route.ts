@@ -45,7 +45,7 @@ export async function POST(
   if (!order || (order.buyer_id !== user.id && order.seller_id !== user.id)) {
     return NextResponse.json({ error: "Commande introuvable." }, { status: 404 });
   }
-  if (order.status !== "held") {
+  if (order.status !== "held" && order.status !== "released") {
     return NextResponse.json(
       { error: "Cette commande n'est pas dans un état contestable." },
       { status: 409 },
@@ -56,7 +56,7 @@ export async function POST(
     .from("orders")
     .update({ status: "disputed" })
     .eq("id", id)
-    .eq("status", "held");
+    .in("status", ["held", "released"]);
 
   if (updateError) {
     return NextResponse.json({ error: "Impossible d'ouvrir le litige." }, { status: 500 });

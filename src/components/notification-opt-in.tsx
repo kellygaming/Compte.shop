@@ -26,11 +26,21 @@ export function NotificationOptIn() {
   }, []);
 
   function handleAccept() {
-    Notification.requestPermission().then((permission) => {
-      localStorage.setItem(PROMPTED_KEY, "true");
-      localStorage.setItem(OPTIN_KEY, permission === "granted" ? "true" : "false");
-      setVisible(false);
-    });
+    // On ferme la bannière tout de suite : certains navigateurs (surtout
+    // mobile) ne résolvent jamais la promesse de requestPermission ou
+    // n'affichent pas de popup, ce qui laissait la bannière bloquée sans
+    // retour visible. Le résultat réel arrive en arrière-plan.
+    localStorage.setItem(PROMPTED_KEY, "true");
+    setVisible(false);
+    try {
+      Notification.requestPermission()
+        .then((permission) => {
+          localStorage.setItem(OPTIN_KEY, permission === "granted" ? "true" : "false");
+        })
+        .catch(() => localStorage.setItem(OPTIN_KEY, "false"));
+    } catch {
+      localStorage.setItem(OPTIN_KEY, "false");
+    }
   }
 
   function handleDecline() {
