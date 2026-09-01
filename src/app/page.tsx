@@ -18,7 +18,7 @@ export default async function HomePage() {
     <>
       <SiteHeader />
       <main>
-        <section className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-14 px-12 pb-[84px] pt-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-[72px] lg:pt-[110px]">
+        <section className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-14 px-5 pb-[84px] pt-24 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-[72px] lg:px-12 lg:pt-[110px]">
           <div>
             <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-border-strong px-[13px] py-1.5 font-mono-ui text-[11.5px] uppercase tracking-[0.06em] text-text-secondary">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" />

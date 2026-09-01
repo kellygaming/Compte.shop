@@ -3,7 +3,7 @@ import { supportContact } from "@/lib/data";
 export function SupportSection() {
   return (
     <section id="support" className="scroll-mt-20 border-t border-border bg-surface-alt">
-      <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-18 px-12 py-20 lg:grid-cols-[1fr_0.9fr] lg:gap-[72px]">
+      <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-18 px-5 py-20 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:gap-[72px] lg:px-12">
         <div>
           <div className="mb-3 font-mono-ui text-[11.5px] uppercase tracking-[0.08em] text-text-tertiary">
             03 — Support

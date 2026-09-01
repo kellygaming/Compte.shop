@@ -3,7 +3,7 @@ import { sellerSteps } from "@/lib/content";
 
 export function SellSection() {
   return (
-    <section id="vendre" className="mx-auto max-w-[1240px] scroll-mt-20 px-12 py-24">
+    <section id="vendre" className="mx-auto max-w-[1240px] scroll-mt-20 px-5 py-24 sm:px-8 lg:px-12">
       <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-[72px]">
         <div>
           <div className="mb-3 font-mono-ui text-[11.5px] uppercase tracking-[0.08em] text-text-tertiary">

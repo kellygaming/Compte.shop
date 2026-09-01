@@ -2,7 +2,7 @@ import { escrowSteps, protections } from "@/lib/content";
 
 export function ProtectionSection() {
   return (
-    <section id="protection" className="mx-auto max-w-[1240px] scroll-mt-20 px-12 py-24">
+    <section id="protection" className="mx-auto max-w-[1240px] scroll-mt-20 px-5 py-24 sm:px-8 lg:px-12">
       <div className="mb-3 font-mono-ui text-[11.5px] uppercase tracking-[0.08em] text-text-tertiary">
         02 — Sécurité
       </div>

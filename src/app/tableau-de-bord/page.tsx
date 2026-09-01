@@ -46,7 +46,7 @@ export default async function DashboardPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-[1240px] px-12 pb-24 pt-12">
+      <main className="mx-auto max-w-[1240px] px-5 pb-24 pt-12 sm:px-8 lg:px-12">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="mb-2 font-display text-[28px] font-semibold tracking-[-0.02em]">

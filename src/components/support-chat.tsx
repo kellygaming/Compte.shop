@@ -11,6 +11,13 @@ export function SupportChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState("");
   const [sending, setSending] = useState(false);
+  // Sur mobile, le clavier virtuel réduit le viewport visible sans que le
+  // navigateur ne redimensionne les éléments "fixed" — on suit
+  // window.visualViewport pour que le champ de saisie reste au-dessus du
+  // clavier au lieu de se retrouver caché ou décalé.
+  const [mobileViewport, setMobileViewport] = useState<{ height: number; top: number } | null>(
+    null,
+  );
 
   useEffect(() => {
     const supabase = createClient();
@@ -20,6 +27,27 @@ export function SupportChat() {
     });
     return () => subscription.subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    if (!open || !vv) return;
+
+    function update() {
+      if (!vv || window.innerWidth >= 640) {
+        setMobileViewport(null);
+        return;
+      }
+      setMobileViewport({ height: vv.height, top: vv.offsetTop });
+    }
+
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, [open]);
 
   async function handleSend() {
     const text = question.trim();
@@ -57,16 +85,19 @@ export function SupportChat() {
   if (!loggedIn) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-40">
+    <>
       {open ? (
-        <div className="mb-3 flex h-[420px] w-[320px] flex-col rounded-[16px] border border-border-soft bg-surface shadow-lg">
+        <div
+          className="fixed inset-x-0 top-0 z-50 flex h-[100dvh] flex-col bg-surface sm:inset-x-auto sm:top-auto sm:bottom-24 sm:right-5 sm:h-[420px] sm:w-[320px] sm:rounded-[16px] sm:border sm:border-border-soft sm:shadow-lg"
+          style={mobileViewport ? { height: mobileViewport.height, top: mobileViewport.top } : undefined}
+        >
           <div className="flex items-center justify-between border-b border-border-soft px-4 py-3">
             <span className="text-[13.5px] font-semibold">Assistant Compte.shop</span>
             <button
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Fermer"
-              className="text-text-tertiary hover:text-text"
+              className="flex h-8 w-8 items-center justify-center text-text-tertiary hover:text-text"
             >
               ✕
             </button>
@@ -95,7 +126,7 @@ export function SupportChat() {
             )}
             {sending ? <p className="text-[12.5px] text-text-tertiary">…</p> : null}
           </div>
-          <div className="flex gap-2 border-t border-border-soft p-3">
+          <div className="flex gap-2 border-t border-border-soft p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
             <input
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
@@ -117,14 +148,16 @@ export function SupportChat() {
         </div>
       ) : null}
 
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-lg text-bg shadow-lg hover:bg-accent-hover"
-        aria-label="Ouvrir l'assistant"
-      >
-        {open ? "✕" : "🤖"}
-      </button>
-    </div>
+      <div className="fixed bottom-5 right-5 z-40">
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-lg text-bg shadow-lg hover:bg-accent-hover"
+          aria-label={open ? "Fermer l'assistant" : "Ouvrir l'assistant"}
+        >
+          {open ? "✕" : "🤖"}
+        </button>
+      </div>
+    </>
   );
 }

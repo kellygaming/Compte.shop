@@ -5,7 +5,7 @@ import type { Game } from "@/lib/types";
 
 export function CategoryGrid({ games }: { games: Game[] }) {
   return (
-    <section className="mx-auto max-w-[1240px] px-12 pb-5 pt-24">
+    <section className="mx-auto max-w-[1240px] px-5 pb-5 pt-24 sm:px-8 lg:px-12">
       <div className="mb-9 flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="mb-3 font-mono-ui text-[11.5px] uppercase tracking-[0.08em] text-text-tertiary">

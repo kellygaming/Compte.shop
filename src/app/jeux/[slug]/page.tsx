@@ -33,7 +33,7 @@ export default async function ListingPage({
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-[1240px] px-12 pb-24 pt-12">
+      <main className="mx-auto max-w-[1240px] px-5 pb-24 pt-12 sm:px-8 lg:px-12">
         <div className="mb-[26px] flex items-center gap-2.5 text-[13px] text-text-tertiary">
           <Link href="/">Accueil</Link>
           <span>/</span>

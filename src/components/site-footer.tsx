@@ -29,7 +29,7 @@ const linkColumns = [
 export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-surface-alt">
-      <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-12 px-12 pb-10 pt-16 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-12 px-5 pb-10 pt-16 sm:grid-cols-2 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-12">
         <div>
           <div className="flex items-center gap-2.5">
             <span className="flex h-[26px] w-[26px] items-center justify-center rounded-[7px] bg-accent font-display text-[15px] font-bold text-bg">
@@ -63,7 +63,7 @@ export function SiteFooter() {
           </div>
         ))}
       </div>
-      <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-2 border-t border-border px-12 py-5 text-[12.5px] text-text-tertiary">
+      <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-2 border-t border-border px-5 py-5 text-[12.5px] text-text-tertiary sm:px-8 lg:px-12">
         <span>© 2026 Compte.shop</span>
         <span>Prix affichés en francs CFA (XOF)</span>
       </div>

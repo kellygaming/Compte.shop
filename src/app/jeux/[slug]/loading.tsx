@@ -5,7 +5,7 @@ export default function ListingLoading() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-[1240px] px-12 pb-24 pt-12">
+      <main className="mx-auto max-w-[1240px] px-5 pb-24 pt-12 sm:px-8 lg:px-12">
         <div className="mb-[26px] h-4 w-40 animate-pulse rounded bg-media-empty" />
         <div className="mb-8 h-9 w-64 animate-pulse rounded bg-media-empty" />
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[240px_1fr]">
