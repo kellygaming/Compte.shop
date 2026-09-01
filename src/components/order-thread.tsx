@@ -13,12 +13,18 @@ type Message = {
 
 const POLL_INTERVAL_MS = 4000;
 
-export function DisputeThread({
-  disputeId,
+/**
+ * Fil de discussion unique par commande : acheteur, vendeur, et admin en
+ * cas de litige. Disponible dès que la commande est payée, pas seulement
+ * pendant un litige — c'est là que se coordonne une remise manuelle, et
+ * là qu'on atterrit en cas de problème, sans changer de canal.
+ */
+export function OrderThread({
+  orderId,
   currentUserId,
   closed,
 }: {
-  disputeId: string;
+  orderId: string;
   currentUserId: string;
   closed: boolean;
 }) {
@@ -32,9 +38,9 @@ export function DisputeThread({
 
     async function load() {
       const { data } = await supabase
-        .from("dispute_messages")
+        .from("order_messages")
         .select("id, sender_id, body, created_at, profiles(pseudo)")
-        .eq("dispute_id", disputeId)
+        .eq("order_id", orderId)
         .order("created_at", { ascending: true });
       if (!cancelled && data) setMessages(data as Message[]);
     }
@@ -45,21 +51,21 @@ export function DisputeThread({
       cancelled = true;
       clearInterval(interval);
     };
-  }, [disputeId]);
+  }, [orderId]);
 
   async function handleSend() {
     if (!body.trim()) return;
     setSending(true);
     const supabase = createClient();
     const { error } = await supabase
-      .from("dispute_messages")
-      .insert({ dispute_id: disputeId, sender_id: currentUserId, body: body.trim() });
+      .from("order_messages")
+      .insert({ order_id: orderId, sender_id: currentUserId, body: body.trim() });
     if (!error) {
       setBody("");
       const { data } = await supabase
-        .from("dispute_messages")
+        .from("order_messages")
         .select("id, sender_id, body, created_at, profiles(pseudo)")
-        .eq("dispute_id", disputeId)
+        .eq("order_id", orderId)
         .order("created_at", { ascending: true });
       if (data) setMessages(data as Message[]);
     }
@@ -68,9 +74,14 @@ export function DisputeThread({
 
   return (
     <div className="rounded-2xl border border-border-soft bg-surface p-5">
+      <div className="mb-3 font-mono-ui text-[11px] uppercase tracking-[0.06em] text-text-tertiary">
+        Discussion
+      </div>
       <div className="mb-4 flex max-h-[360px] flex-col gap-2.5 overflow-y-auto">
         {messages.length === 0 ? (
-          <p className="text-[13px] text-text-tertiary">Aucun message pour l&apos;instant.</p>
+          <p className="text-[13px] text-text-tertiary">
+            Aucun message pour l&apos;instant. Écrivez ici pour vous coordonner.
+          </p>
         ) : (
           messages.map((message) => {
             const isSelf = message.sender_id === currentUserId;
@@ -117,7 +128,7 @@ export function DisputeThread({
           </button>
         </div>
       ) : (
-        <p className="text-[13px] text-text-tertiary">Ce litige est clos.</p>
+        <p className="text-[13px] text-text-tertiary">Cette commande est close.</p>
       )}
     </div>
   );

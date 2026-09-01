@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DisputeThread } from "@/components/dispute-thread";
+import { OrderThread } from "@/components/order-thread";
 
 type OrderStatus =
   | "pending_payment"
@@ -160,7 +160,8 @@ export function OrderPanel({
       {status === "held" && !order.delivered_at && role === "seller" ? (
         <div className="rounded-2xl border border-border-soft bg-surface p-6">
           <p className="mb-3 text-[13.5px] text-text-secondary">
-            Transmettez les identifiants du compte à l&apos;acheteur.
+            Transmettez les identifiants du compte à l&apos;acheteur. Vous
+            pouvez aussi discuter avec lui juste en dessous.
           </p>
           {order.confirm_deadline ? (
             <p className="mb-3 text-[13px] text-text-tertiary">
@@ -323,24 +324,25 @@ export function OrderPanel({
         </div>
       ) : null}
 
+      {status === "held" || status === "released" || status === "disputed" ? (
+        <OrderThread orderId={order.id} currentUserId={userId} closed={false} />
+      ) : null}
+
       {status === "disputed" && dispute ? (
-        <div className="flex flex-col gap-4">
-          <DisputeThread disputeId={dispute.id} currentUserId={userId} closed={false} />
-          {!escalated ? (
-            <button
-              type="button"
-              disabled={loading}
-              onClick={handleEscalate}
-              className="self-start rounded-[10px] border border-border-strong px-5 py-2.5 text-sm hover:border-border-hover disabled:opacity-60"
-            >
-              Appeler un admin
-            </button>
-          ) : (
-            <p className="text-[13px] text-text-tertiary">
-              Un administrateur a été prévenu et va trancher.
-            </p>
-          )}
-        </div>
+        !escalated ? (
+          <button
+            type="button"
+            disabled={loading}
+            onClick={handleEscalate}
+            className="self-start rounded-[10px] border border-border-strong px-5 py-2.5 text-sm hover:border-border-hover disabled:opacity-60"
+          >
+            Appeler un admin
+          </button>
+        ) : (
+          <p className="text-[13px] text-text-tertiary">
+            Un administrateur a été prévenu et va trancher.
+          </p>
+        )
       ) : null}
 
       {error ? <p className="text-[13px] text-text-secondary">{error}</p> : null}

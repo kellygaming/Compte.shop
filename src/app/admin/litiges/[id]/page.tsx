@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { DisputeThread } from "@/components/dispute-thread";
+import { OrderThread } from "@/components/order-thread";
 import { getAdminUser } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatAmount } from "@/lib/format";
@@ -60,7 +60,7 @@ export default async function AdminDisputeDetailPage({
         </div>
 
         <div className="mb-4">
-          <DisputeThread disputeId={dispute.id} currentUserId={admin.id} closed={false} />
+          <OrderThread orderId={dispute.order_id} currentUserId={admin.id} closed={false} />
         </div>
 
         {dispute.status === "resolved" ? (

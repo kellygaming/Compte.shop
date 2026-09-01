@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { getAdminUser } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatAmount } from "@/lib/format";
+import { OrderThread } from "@/components/order-thread";
 import { ReconcileButton } from "./reconcile-button";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -142,6 +143,10 @@ export default async function AdminOrderDetailPage({
               : ""}
           </div>
         )}
+
+        {order.status !== "pending_payment" && order.status !== "cancelled" ? (
+          <OrderThread orderId={order.id} currentUserId={admin.id} closed={false} />
+        ) : null}
       </main>
       <SiteFooter />
     </>
