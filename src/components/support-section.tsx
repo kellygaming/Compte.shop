@@ -1,4 +1,9 @@
-import { supportContact } from "@/lib/data";
+"use client";
+
+import { OPEN_SUPPORT_CHAT_EVENT } from "@/components/support-chat";
+
+const supportContact = "WhatsApp +225 0173507682";
+const WHATSAPP_URL = `https://wa.me/225${supportContact.replace(/\D/g, "").replace(/^225/, "")}`;
 
 export function SupportSection() {
   return (
@@ -19,16 +24,19 @@ export function SupportSection() {
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
+              onClick={() => window.dispatchEvent(new Event(OPEN_SUPPORT_CHAT_EVENT))}
               className="rounded-[10px] bg-accent px-[22px] py-[13px] text-sm font-semibold text-bg hover:bg-accent-hover"
             >
               Ouvrir le chat
             </button>
-            <button
-              type="button"
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-[10px] border border-border-strong px-[22px] py-[13px] text-sm hover:border-border-hover"
             >
               {supportContact}
-            </button>
+            </a>
           </div>
         </div>
         <div className="rounded-2xl border border-border-soft bg-surface p-6">

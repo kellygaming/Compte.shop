@@ -119,5 +119,3 @@ export function getFilterGroups(): FilterGroup[] {
     { id: "seller", label: "Vendeur", options: ["ID vérifié", "50+ ventes", "Note 4,5 et plus"] },
   ];
 }
-
-export const supportContact = "WhatsApp +225 0173507682";

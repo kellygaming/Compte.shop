@@ -1,11 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
+/**
+ * Le bloc "Support" de la page d'accueil (marketing, statique) a son
+ * propre bouton "Ouvrir le chat" — ce n'est pas ce composant, donc un
+ * simple onClick ne suffit pas à les relier. On passe par un événement
+ * DOM global : ce composant (toujours monté dans le layout) l'écoute et
+ * s'ouvre lui-même.
+ */
+export const OPEN_SUPPORT_CHAT_EVENT = "compte-shop:open-support-chat";
+
 export function SupportChat() {
+  const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -48,6 +59,18 @@ export function SupportChat() {
       vv.removeEventListener("scroll", update);
     };
   }, [open]);
+
+  useEffect(() => {
+    function handleOpenRequest() {
+      if (loggedIn) {
+        setOpen(true);
+      } else {
+        router.push("/connexion?next=/%23support");
+      }
+    }
+    window.addEventListener(OPEN_SUPPORT_CHAT_EVENT, handleOpenRequest);
+    return () => window.removeEventListener(OPEN_SUPPORT_CHAT_EVENT, handleOpenRequest);
+  }, [loggedIn, router]);
 
   async function handleSend() {
     const text = question.trim();
