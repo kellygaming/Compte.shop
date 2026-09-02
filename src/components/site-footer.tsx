@@ -22,6 +22,7 @@ const linkColumns = [
     links: [
       { label: "Protection", href: "/#protection" },
       { label: "Support", href: "/#support" },
+      { label: "Conditions d'utilisation", href: "/conditions" },
     ],
   },
 ];

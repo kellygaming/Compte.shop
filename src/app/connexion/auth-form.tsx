@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -19,11 +20,18 @@ export function AuthForm({ next }: { next: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingConfirmation, setPendingConfirmation] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+
+    if (mode === "signup" && !acceptedTerms) {
+      setError("Vous devez accepter les conditions d'utilisation pour créer un compte.");
+      return;
+    }
+
+    setLoading(true);
 
     const supabase = createClient();
 
@@ -155,11 +163,30 @@ export function AuthForm({ next }: { next: string }) {
           />
         </Field>
 
+        {mode === "signup" ? (
+          <label className="flex items-start gap-2.5 text-[12.5px] leading-relaxed text-text-secondary">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="mt-0.5"
+            />
+            <span>
+              J&apos;ai lu et j&apos;accepte les{" "}
+              <Link href="/conditions" target="_blank" className="text-accent hover:underline">
+                conditions d&apos;utilisation
+              </Link>
+              , notamment le fait que revendre un compte peut être interdit par l&apos;éditeur du
+              jeu et que ce risque m&apos;incombe.
+            </span>
+          </label>
+        ) : null}
+
         {error ? <p className="text-[13px] text-text-secondary">{error}</p> : null}
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || (mode === "signup" && !acceptedTerms)}
           className="mt-1.5 rounded-[10px] bg-accent px-6 py-3 text-sm font-semibold text-bg hover:bg-accent-hover disabled:opacity-60"
         >
           {loading
