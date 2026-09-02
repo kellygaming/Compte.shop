@@ -11,14 +11,23 @@ const LAST_UPDATED = "2 septembre 2026";
  * technique entre acheteurs et vendeurs, jamais partie à la transaction
  * ni propriétaire des comptes vendus.
  *
- * ⚠️ Ceci n'est PAS un avis juridique. Les champs entre crochets
- * [comme ceci] doivent être complétés avec les vraies informations de
- * l'entreprise avant que ce texte n'ait une réelle valeur contractuelle,
- * et une relecture par un avocat (idéalement basé en Côte d'Ivoire, vu
- * MoneyFusion et le public visé) est fortement recommandée avant un
- * lancement grand public — notamment sur le statut de séquestre des
- * fonds, qui touche parfois à la réglementation sur la monnaie
- * électronique selon les montants et volumes traités.
+ * Entité éditrice : KELLY GAMING SARL (RCCM CI-ABJ-03-2026-B13-07299,
+ * Abidjan) — entité existante de l'opérateur, déjà active dans le
+ * commerce de produits numériques ; à ce stade utilisée aussi pour
+ * Compte.shop faute d'une structure dédiée. Son objet social déclaré
+ * (« commerce de produit numérique et service digitaux ») couvre
+ * plausiblement la revente d'actifs numériques de jeu, mais ne
+ * mentionne pas explicitement l'intermédiation / le séquestre de fonds
+ * de tiers — voir la note à l'opérateur au sujet d'une éventuelle
+ * extension de l'objet social ou d'une structure dédiée si le volume
+ * grandit.
+ *
+ * ⚠️ Ceci n'est PAS un avis juridique. Une relecture par un avocat
+ * (idéalement basé en Côte d'Ivoire, vu MoneyFusion et le public visé)
+ * reste recommandée avant de traiter ce texte comme définitif —
+ * notamment sur le statut de séquestre des fonds, qui touche parfois à
+ * la réglementation sur la monnaie électronique selon les montants et
+ * volumes traités.
  */
 export default function ConditionsPage() {
   return (
@@ -35,10 +44,11 @@ export default function ConditionsPage() {
         <div className="flex flex-col gap-9 text-[14.5px] leading-relaxed text-text-secondary">
           <Section title="1. Objet et statut de Compte.shop">
             <p>
-              Compte.shop (« la Plateforme ») est un service édité par [Raison sociale de
-              l&apos;entreprise à compléter], immatriculée sous le numéro [RCCM / numéro
-              d&apos;immatriculation à compléter], dont le siège est situé à [adresse à
-              compléter].
+              Compte.shop (« la Plateforme ») est un service édité par KELLY GAMING SARL, société
+              à responsabilité limitée unipersonnelle immatriculée au Registre du Commerce et du
+              Crédit Mobilier sous le numéro CI-ABJ-03-2026-B13-07299, dont le siège social est
+              situé à Abidjan, Yopougon Azito, en face du carrefour supermarché BM, 09 lot 387
+              îlot 42, Côte d&apos;Ivoire.
             </p>
             <p>
               Compte.shop est une place de marché entre particuliers (« C2C ») : la Plateforme
