@@ -1,7 +1,7 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getAdminUser } from "@/lib/admin";
+import { requireAdmin } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { KycReviewActions } from "./kyc-review-actions";
 
@@ -29,12 +29,9 @@ export default async function AdminSellerKycPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const admin = await getAdminUser();
-  if (!admin) {
-    redirect("/");
-  }
-
   const { id } = await params;
+  await requireAdmin(`/admin/vendeurs/${id}`);
+
   const db = createServiceClient();
 
   const { data: seller } = await db

@@ -1,7 +1,7 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getAdminUser } from "@/lib/admin";
+import { requireAdmin } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatAmount, shortOrderRef } from "@/lib/format";
 import { OrderThread } from "@/components/order-thread";
@@ -22,12 +22,9 @@ export default async function AdminOrderDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const admin = await getAdminUser();
-  if (!admin) {
-    redirect("/");
-  }
-
   const { id } = await params;
+  const admin = await requireAdmin(`/admin/commandes/${id}`);
+
   const db = createServiceClient();
 
   const { data: order } = await db

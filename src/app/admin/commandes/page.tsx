@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getAdminUser } from "@/lib/admin";
+import { requireAdmin } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatAmount, shortOrderRef } from "@/lib/format";
 import { minutesAgoTimestamp } from "@/lib/orders";
@@ -30,10 +29,7 @@ const PAYMENT_LABELS: Record<string, string> = {
  * (identifiants transmis compris) pour le support.
  */
 export default async function AdminOrdersPage() {
-  const admin = await getAdminUser();
-  if (!admin) {
-    redirect("/");
-  }
+  await requireAdmin("/admin/commandes");
 
   const db = createServiceClient();
   const { data: orders } = await db

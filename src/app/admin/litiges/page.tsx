@@ -1,16 +1,12 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getAdminUser } from "@/lib/admin";
+import { requireAdmin } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatAmount } from "@/lib/format";
 
 export default async function AdminDisputesPage() {
-  const admin = await getAdminUser();
-  if (!admin) {
-    redirect("/");
-  }
+  await requireAdmin("/admin/litiges");
 
   const db = createServiceClient();
   const { data: disputes } = await db

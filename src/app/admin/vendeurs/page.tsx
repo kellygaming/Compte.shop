@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getAdminUser } from "@/lib/admin";
+import { requireAdmin } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -17,10 +16,7 @@ const STATUS_LABELS: Record<string, string> = {
  * par cette page.
  */
 export default async function AdminSellersPage() {
-  const admin = await getAdminUser();
-  if (!admin) {
-    redirect("/");
-  }
+  await requireAdmin("/admin/vendeurs");
 
   const db = createServiceClient();
   const { data: sellers } = await db

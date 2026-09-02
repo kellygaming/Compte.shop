@@ -1,8 +1,8 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { OrderThread } from "@/components/order-thread";
-import { getAdminUser } from "@/lib/admin";
+import { requireAdmin } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatAmount } from "@/lib/format";
 import { ResolvePanel } from "./resolve-panel";
@@ -12,12 +12,9 @@ export default async function AdminDisputeDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const admin = await getAdminUser();
-  if (!admin) {
-    redirect("/");
-  }
-
   const { id } = await params;
+  const admin = await requireAdmin(`/admin/litiges/${id}`);
+
   const db = createServiceClient();
 
   const { data: dispute } = await db

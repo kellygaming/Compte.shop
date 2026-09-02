@@ -1,16 +1,12 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getAdminUser } from "@/lib/admin";
+import { requireAdmin } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { minutesAgoISOString } from "@/lib/orders";
 
 export default async function AdminHomePage() {
-  const admin = await getAdminUser();
-  if (!admin) {
-    redirect("/");
-  }
+  await requireAdmin("/admin");
 
   const db = createServiceClient();
   const fiveMinutesAgo = minutesAgoISOString(5);

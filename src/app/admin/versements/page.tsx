@@ -1,16 +1,12 @@
-import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getAdminUser } from "@/lib/admin";
+import { requireAdmin } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatAmount } from "@/lib/format";
 import { MarkPaidButton } from "./mark-paid-button";
 
 export default async function AdminPayoutsPage() {
-  const admin = await getAdminUser();
-  if (!admin) {
-    redirect("/");
-  }
+  await requireAdmin("/admin/versements");
 
   const db = createServiceClient();
   const { data: orders } = await db
