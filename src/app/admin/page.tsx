@@ -14,7 +14,7 @@ export default async function AdminHomePage() {
 
   const db = createServiceClient();
   const fiveMinutesAgo = minutesAgoISOString(5);
-  const [{ count: openDisputes }, { count: pendingPayouts }, { count: stuckPayments }] =
+  const [{ count: openDisputes }, { count: pendingPayouts }, { count: stuckPayments }, { count: pendingSellers }] =
     await Promise.all([
       db.from("disputes").select("id", { count: "exact", head: true }).eq("status", "open"),
       db
@@ -27,6 +27,7 @@ export default async function AdminHomePage() {
         .select("id", { count: "exact", head: true })
         .eq("status", "pending_payment")
         .lt("created_at", fiveMinutesAgo),
+      db.from("sellers").select("profile_id", { count: "exact", head: true }).eq("kyc_status", "pending"),
     ]);
 
   return (
@@ -64,6 +65,17 @@ export default async function AdminHomePage() {
             <div className="mb-1 font-display text-lg font-semibold">Versements</div>
             <div className="text-sm text-text-secondary">
               {pendingPayouts ?? 0} en attente
+            </div>
+          </Link>
+          <Link
+            href="/admin/vendeurs"
+            className={`rounded-2xl border p-6 hover:border-border-hover ${
+              pendingSellers ? "border-accent bg-accent/5" : "border-border-soft bg-surface"
+            }`}
+          >
+            <div className="mb-1 font-display text-lg font-semibold">Vendeurs à vérifier</div>
+            <div className="text-sm text-text-secondary">
+              {pendingSellers ? `${pendingSellers} dossier(s) en attente` : "Rien à traiter"}
             </div>
           </Link>
         </div>

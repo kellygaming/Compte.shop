@@ -29,7 +29,7 @@ export default async function DashboardPage() {
 
   const { data: seller } = await supabase
     .from("sellers")
-    .select("kyc_status")
+    .select("kyc_status, kyc_rejection_reason")
     .eq("profile_id", user.id)
     .maybeSingle();
 
@@ -52,14 +52,20 @@ export default async function DashboardPage() {
             <h1 className="mb-2 font-display text-[28px] font-semibold tracking-[-0.02em]">
               Mes annonces
             </h1>
-            {seller.kyc_status !== "verified" ? (
+            {seller.kyc_status === "verified" ? (
               <p className="text-[13.5px] text-text-secondary">
-                Identité en cours de vérification — vous pourrez publier une
-                fois validé.
+                Identité vérifiée.
+              </p>
+            ) : seller.kyc_status === "rejected" ? (
+              <p className="max-w-[520px] text-[13.5px] text-text-secondary">
+                Votre dossier n&apos;a pas été validé
+                {seller.kyc_rejection_reason ? ` : ${seller.kyc_rejection_reason}` : "."}{" "}
+                Contactez le support (assistant en bas de page) pour renvoyer vos documents.
               </p>
             ) : (
               <p className="text-[13.5px] text-text-secondary">
-                Identité vérifiée.
+                Identité en cours de vérification — vous pourrez publier une
+                fois validé.
               </p>
             )}
           </div>

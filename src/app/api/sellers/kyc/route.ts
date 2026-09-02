@@ -7,13 +7,11 @@ import { createServiceClient } from "@/lib/supabase/service";
  * (bucket privé kyc-documents, policy propriétaire uniquement) — cette
  * route ne reçoit que les chemins et le numéro de téléphone.
  *
- * ⚠️ Auto-approbation temporaire (décision produit du 2026-08-29, en
- * attendant un back-office de revue manuelle) : le dossier est marqué
- * vérifié immédiatement, sans passer par un humain, en contradiction
- * avec la règle des 24h de PROJET.md. Le service role est nécessaire
+ * Le dossier part en statut "pending" : un admin le valide ou le rejette
+ * depuis /admin/vendeurs (POST /api/admin/sellers/[id]/kyc) avant que le
+ * vendeur puisse publier une annonce. Le service role est nécessaire
  * précisément parce que la policy RLS de `sellers` interdit à un client
- * de s'auto-vérifier — ne pas assouplir cette policy, modifier plutôt
- * les deux lignes marquées ci-dessous quand la vraie revue existera.
+ * de s'auto-vérifier — ne pas assouplir cette policy.
  */
 export async function POST(request: Request) {
   const sessionClient = await createClient();
@@ -69,9 +67,7 @@ export async function POST(request: Request) {
     birth_certificate_path: payload.birth_certificate_path,
     selfie_path: payload.selfie_path,
     kyc_submitted_at: new Date().toISOString(),
-    // Auto-approbation temporaire — voir le commentaire en tête de fichier.
-    kyc_status: "verified",
-    kyc_reviewed_at: new Date().toISOString(),
+    kyc_status: "pending",
   });
 
   if (insertError) {
