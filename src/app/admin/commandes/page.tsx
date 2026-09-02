@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getAdminUser } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
-import { formatAmount } from "@/lib/format";
+import { formatAmount, shortOrderRef } from "@/lib/format";
 import { minutesAgoTimestamp } from "@/lib/orders";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -80,7 +80,7 @@ export default async function AdminOrdersPage() {
                       {order.listings?.title ?? "Annonce supprimée"}
                     </div>
                     <div className="text-[12.5px] text-text-tertiary">
-                      {order.profiles?.pseudo ?? "Acheteur"} → {order.sellers?.profiles?.pseudo ?? "Vendeur"} ·{" "}
+                      #{shortOrderRef(order.id)} · {order.profiles?.pseudo ?? "Acheteur"} → {order.sellers?.profiles?.pseudo ?? "Vendeur"} ·{" "}
                       {new Date(order.created_at).toLocaleString("fr-FR")}
                     </div>
                   </div>

@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { shortOrderRef } from "@/lib/format";
 
 /**
  * Assistant de support propulsé par DeepSeek (API compatible OpenAI).
  * Répond en français, simplement, sur le fonctionnement réel du site —
  * pas un chatbot générique : le prompt système décrit les vrais parcours
- * (achat, séquestre, discussion acheteur-vendeur, versement, litiges).
+ * (achat, séquestre, discussion acheteur-vendeur, versement, litiges) ET
+ * reçoit les vraies commandes de l'utilisateur connecté (buildOrdersContext
+ * ci-dessous), pour répondre sur SON achat précis sans que l'opérateur
+ * (souvent indisponible) ait à intervenir.
  *
  * DEEPSEEK_API_KEY doit être défini côté Vercel — sans elle, on répond
  * une erreur claire plutôt que de planter.
@@ -21,8 +25,79 @@ Comment le site fonctionne réellement :
 - Litige : si problème, le bouton "Appeler un admin" est sur la page de la commande, sous la discussion. Ça prévient un administrateur qui vient trancher.
 - Versement vendeur : une fois la vente confirmée par l'acheteur, le vendeur va sur la page de sa commande (accessible depuis "Mes annonces" dans le tableau de bord), indique son numéro Mobile Money avec l'indicatif du pays, et clique "Demander mon versement". Le versement peut prendre jusqu'à 24h.
 - Mes achats / Mes annonces : dans l'en-tête du site, un acheteur retrouve ses achats sous "Mes achats", un vendeur ses annonces sous "Mes annonces".
+- Chaque commande a une référence courte affichée sur sa page (ex: "N° commande #A1B2C3D4"), qui correspond à celles listées ci-dessous.
+
+Tu reçois ci-dessous la liste réelle des achats et ventes de la personne à qui tu parles en ce moment — utilise-la en priorité pour répondre à toute question sur "mon achat", "ma commande", "mon paiement", "mon versement", etc. Ne devine et n'invente jamais un statut : reprends exactement celui donné. Si la personne cite une référence (#XXXXXXXX), retrouve-la dans la liste. Si sa question porte sur une commande absente de la liste ou que la situation nécessite une décision humaine (litige non résolu, erreur suspecte), dis-le clairement et oriente-la vers le bouton "Appeler un admin" sur la page de la commande concernée, plutôt que de deviner.
 
 Si la question ne concerne pas Compte.shop, dis poliment que tu ne peux aider que sur l'utilisation du site.`;
+
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  pending_payment: "paiement en attente",
+  held: "payée, argent en séquestre",
+  released: "terminée, vendeur payé",
+  refunded: "remboursée",
+  disputed: "en litige",
+  cancelled: "annulée",
+};
+
+type OrderForContext = {
+  id: string;
+  status: string;
+  amount_xof: number;
+  created_at: string;
+  payout_requested_at?: string | null;
+  paid_out_at?: string | null;
+  listings: { title: string } | { title: string }[] | null;
+};
+
+function formatOrderLine(order: OrderForContext, asSeller: boolean) {
+  const listing = Array.isArray(order.listings) ? order.listings[0] : order.listings;
+  const title = listing?.title ?? "annonce supprimée";
+  const status = ORDER_STATUS_LABELS[order.status] ?? order.status;
+  const date = new Date(order.created_at).toLocaleDateString("fr-FR");
+  let extra = "";
+  if (asSeller) {
+    if (order.paid_out_at) extra = " (versement déjà effectué)";
+    else if (order.payout_requested_at) extra = " (versement demandé, en attente sous 24h)";
+  }
+  return `#${shortOrderRef(order.id)} — "${title}" — ${order.amount_xof} F CFA — ${date} — statut : ${status}${extra} — /commandes/${order.id}`;
+}
+
+async function buildOrdersContext(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+) {
+  const [{ data: buyerOrders }, { data: sellerOrders }] = await Promise.all([
+    supabase
+      .from("orders")
+      .select("id, status, amount_xof, created_at, listings(title)")
+      .eq("buyer_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(8),
+    supabase
+      .from("orders")
+      .select("id, status, amount_xof, created_at, payout_requested_at, paid_out_at, listings(title)")
+      .eq("seller_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
+
+  let context = "";
+  context +=
+    buyerOrders && buyerOrders.length > 0
+      ? `\n\nSes achats récents (le plus récent en premier) :\n${buyerOrders
+          .map((o) => formatOrderLine(o as OrderForContext, false))
+          .join("\n")}`
+      : "\n\nElle n'a fait aucun achat pour l'instant.";
+
+  if (sellerOrders && sellerOrders.length > 0) {
+    context += `\n\nSes ventes récentes en tant que vendeur :\n${sellerOrders
+      .map((o) => formatOrderLine(o as OrderForContext, true))
+      .join("\n")}`;
+  }
+
+  return context;
+}
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -61,6 +136,8 @@ export async function POST(request: Request) {
   );
 
   try {
+    const ordersContext = await buildOrdersContext(supabase, user.id);
+
     const response = await fetch("https://api.deepseek.com/chat/completions", {
       method: "POST",
       headers: {
@@ -70,7 +147,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         model: "deepseek-chat",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: SYSTEM_PROMPT + ordersContext },
           ...history,
           { role: "user", content: question },
         ],

@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { createClient } from "@/lib/supabase/server";
 import { releaseExpiredOrders } from "@/lib/orders";
-import { formatAmount } from "@/lib/format";
+import { formatAmount, shortOrderRef } from "@/lib/format";
 
 const STATUS_LABELS: Record<string, string> = {
   pending_payment: "Paiement en attente",
@@ -61,7 +61,7 @@ export default async function MesAchatsPage() {
                       {order.listings?.title ?? "Annonce supprimée"}
                     </div>
                     <div className="text-[12.5px] text-text-tertiary">
-                      {new Date(order.created_at).toLocaleString("fr-FR")}
+                      #{shortOrderRef(order.id)} · {new Date(order.created_at).toLocaleString("fr-FR")}
                     </div>
                   </div>
                 </div>

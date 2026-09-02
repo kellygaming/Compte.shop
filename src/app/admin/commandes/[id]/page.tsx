@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getAdminUser } from "@/lib/admin";
 import { createServiceClient } from "@/lib/supabase/service";
-import { formatAmount } from "@/lib/format";
+import { formatAmount, shortOrderRef } from "@/lib/format";
 import { OrderThread } from "@/components/order-thread";
 import { ImageGallery } from "@/app/annonces/[id]/image-gallery";
 import { ReconcileButton } from "./reconcile-button";
@@ -56,7 +56,8 @@ export default async function AdminOrderDetailPage({
           {order.listings?.title ?? "Annonce supprimée"}
         </h1>
         <p className="mb-4 text-[13px] text-text-tertiary">
-          {formatAmount(order.amount_xof)} F CFA · {STATUS_LABELS[order.status] ?? order.status}
+          #{shortOrderRef(order.id)} · {formatAmount(order.amount_xof)} F CFA ·{" "}
+          {STATUS_LABELS[order.status] ?? order.status}
         </p>
 
         {order.listings?.images && order.listings.images.length > 0 ? (

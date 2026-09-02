@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { createClient } from "@/lib/supabase/server";
 import { releaseExpiredOrders } from "@/lib/orders";
-import { formatAmount } from "@/lib/format";
+import { formatAmount, shortOrderRef } from "@/lib/format";
 import { OrderPanel } from "./order-panel";
 import { ImageGallery } from "@/app/annonces/[id]/image-gallery";
 
@@ -56,10 +56,17 @@ export default async function OrderPage({
       <SiteHeader />
       <main className="mx-auto max-w-[560px] px-6 py-24">
         <h1 className="mb-2 font-display text-[26px] font-semibold tracking-[-0.02em]">
-          Commande
+          Commande{" "}
+          <span className="font-mono-ui text-[15px] font-normal text-text-tertiary">
+            #{shortOrderRef(order.id)}
+          </span>
         </h1>
         <p className="mb-4 text-sm text-text-tertiary">
           {order.listings?.title ?? "Annonce"} · {formatAmount(order.amount_xof)} F CFA
+        </p>
+        <p className="mb-4 text-[12.5px] text-text-tertiary">
+          Donnez cette référence (#{shortOrderRef(order.id)}) à l&apos;assistant ou à un admin en
+          cas de question sur cette commande.
         </p>
         {order.listings?.images && order.listings.images.length > 0 ? (
           <details className="mb-6 rounded-2xl border border-border-soft bg-surface p-4">
